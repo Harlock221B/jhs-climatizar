@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "date-fns": "^4.4.0",
+    "firebase": "^12.19.0",
     "lucide-react": "^0.577.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.18.4",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {

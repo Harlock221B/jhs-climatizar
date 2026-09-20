@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regras para Orçamentos da JHS Climatizar
+    match /orcamentos/{orcamentoId} {
+      // Usuário autenticado tem acesso total
+      allow read, write: if request.auth != null;
+      // Visitantes do site público podem enviar solicitações de orçamento
+      allow create: if true;
+    }
+
+    // Regras para Clientes
+    match /clientes/{clienteId} {
+      // Usuário autenticado tem acesso total
+      allow read, write: if request.auth != null;
+      // Visitantes do site público que solicitam orçamento podem registrar contato inicial
+      allow create: if true;
+    }
+
+    // Regras para Agendamentos
+    match /agendamentos/{agendamentoId} {
+      // Apenas usuário autenticado acessa e gerencia a agenda técnica
+      allow read, write: if request.auth != null;
+    }
+
+    // Fallback geral: permite leitura e gravação para qualquer usuário autenticado
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
