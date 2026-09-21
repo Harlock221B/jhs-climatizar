@@ -26,10 +26,20 @@ import {
 } from 'lucide-react';
 import { solicitarOrcamentoViaSite } from '../services/db';
 import logoIcon from '../assets/icon/icon.png';
+import logoIconeSite from '../assets/icon/icone_site.jpg';
 import fotoRodrigo1 from '../assets/img/rodrigo-1.png';
 import fotoRodrigo2 from '../assets/img/rodrigo-2.png';
 import fotoRodrigo3 from '../assets/img/rodrigo-3.jpeg';
 import fotoRodrigo4 from '../assets/img/rodrigo-4.jpeg';
+import fotoRodrigo5 from '../assets/img/rodrigo-5.png';
+import fotoRodrigo6 from '../assets/img/rodrigo-6.png';
+
+const AVATAR_PROFILES = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80',
+];
 
 const WHATSAPP_NUMBER = "5519992327227";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de solicitar um orçamento para ar-condicionado com a equipe da JHS Climatizar.`;
@@ -146,8 +156,8 @@ const Hero = () => {
 
           <div className="flex items-center gap-6 pt-8 border-t border-slate-200 w-full max-w-md">
             <div className="flex -space-x-4">
-               {[1,2,3,4].map((i) => (
-                 <img key={i} src={`https://i.pravatar.cc/100?img=${i + 20}`} alt="Cliente" className="w-12 h-12 rounded-full border-4 border-[#F8FAFC] shadow-sm" />
+               {AVATAR_PROFILES.map((src, i) => (
+                 <img key={i} src={src} alt="Cliente Satisfeito JHS Climatizar" className="w-12 h-12 rounded-full border-4 border-[#F8FAFC] shadow-sm object-cover" />
                ))}
             </div>
             <div className="flex flex-col">
@@ -155,7 +165,7 @@ const Hero = () => {
                 {[1,2,3,4,5].map(star => <Star key={star} className="w-4 h-4 fill-current" />)}
               </div>
               <span className="text-sm font-bold text-slate-900">5.0 de 5.0</span>
-              <span className="text-xs text-slate-500">+500 lares climatizados</span>
+              <span className="text-xs text-slate-500">+500 lares e empresas climatizadas</span>
             </div>
           </div>
         </div>
@@ -163,35 +173,35 @@ const Hero = () => {
         {/* Imagem Real do Hero */}
         <div className="relative w-full aspect-square lg:aspect-[4/5] rounded-[3rem] overflow-hidden group shadow-2xl border-4 border-white bg-slate-950">
           <img 
-            src={fotoRodrigo4} 
-            alt="Rodrigo - Especialista JHS Climatizar em Instalação e Teste Manifold" 
-            className="w-full h-full object-cover object-top transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
+            src={fotoRodrigo6} 
+            alt="Rodrigo - Especialista JHS Climatizar com Certificação NR-35 em Instalação Externa" 
+            className="w-full h-full object-cover object-[50%_15%] transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-50 group-hover:opacity-30 transition-opacity" />
           
           {/* Floating Badges */}
           <div className="absolute top-6 left-4 sm:left-6 z-20 bg-white/95 backdrop-blur-md p-3.5 pr-5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-100">
             <img 
               src={fotoRodrigo1} 
               alt="Rodrigo - Responsável Técnico" 
-              className="w-12 h-12 rounded-xl object-cover object-top border-2 border-blue-500 shadow-sm"
+              className="w-12 h-12 rounded-xl object-cover object-[50%_20%] border-2 border-blue-500 shadow-sm"
             />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <p className="text-xs font-black text-slate-900">Rodrigo • Responsável Técnico</p>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">Instalações em Monte Mor e Região</p>
+              <p className="text-[11px] text-slate-500 font-medium">Atendimento Direto em Monte Mor e RMC</p>
             </div>
           </div>
 
           <div className="absolute bottom-6 right-4 sm:right-6 z-20 bg-slate-900/90 backdrop-blur-md px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700/60">
             <div className="bg-blue-500/20 p-2.5 rounded-xl">
-              <ThermometerSnowflake className="w-5 h-5 text-blue-400" />
+              <ShieldCheck className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-sm font-extrabold text-white">Vácuo & Pressão Manifold</p>
-              <p className="text-xs text-blue-200">100% testado sem vazamentos</p>
+              <p className="text-sm font-extrabold text-white">Certificado NR-35 & NR-10</p>
+              <p className="text-xs text-blue-200">Segurança Total & 100% Cobre</p>
             </div>
           </div>
         </div>
@@ -205,23 +215,31 @@ const Services = () => {
   const servicos = [
     { 
       titulo: 'Instalação Premium', 
-      icone: <Wrench className="w-8 h-8 text-blue-600" />, 
-      desc: 'Medição precisa, uso de tubulação 100% cobre, aplicação de vácuo profundo e acabamento estético que valoriza o seu ambiente.' 
+      tag: '100% Cobre & Vácuo',
+      fotoProcesso: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80',
+      icone: <Wrench className="w-5 h-5 text-blue-600" />, 
+      desc: 'Medição a laser, furação com aspirador acoplado, uso estrito de tubulação 100% cobre e acabamento milimétrico que respeita a estética do seu cômodo.' 
     },
     { 
       titulo: 'Manutenção Corretiva', 
-      icone: <Settings className="w-8 h-8 text-blue-600" />, 
-      desc: 'Seu ar parou de gelar, está pingando ou fazendo barulho? Identifico o problema na raiz e resolvo com peças de qualidade.' 
+      tag: 'Diagnóstico & Reparo',
+      fotoProcesso: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+      icone: <Settings className="w-5 h-5 text-blue-600" />, 
+      desc: 'Ar parou de gelar, está vazando água ou emitindo ruídos? Teste de sensores, capacitores, placas inverter e recarga precisa de fluído refrigerante.' 
     },
     { 
       titulo: 'Limpeza Profunda', 
-      icone: <Droplets className="w-8 h-8 text-cyan-500" />, 
-      desc: 'Desmontagem técnica para remoção completa de fungos e crostas de sujeira. Seu aparelho gela mais e gasta menos energia.' 
+      tag: 'Lavagem sob Pressão',
+      fotoProcesso: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
+      icone: <Droplets className="w-5 h-5 text-cyan-500" />, 
+      desc: 'Desmontagem técnica da carenagem plástica e aplicação de máquina de pressão com bolsa impermeável vedada. Remoção física de fungos e crostas.' 
     },
     { 
       titulo: 'Higienização Anvisa', 
-      icone: <Sparkles className="w-8 h-8 text-cyan-500" />, 
-      desc: 'Aplicação de bactericidas profissionais. Elimina odores ruins e protege a saúde respiratória da sua família contra ácaros e bactérias.' 
+      tag: 'Bactericida Hospitalar',
+      fotoProcesso: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+      icone: <Sparkles className="w-5 h-5 text-cyan-500" />, 
+      desc: 'Aplicação de sanitizantes e desinfetantes homologados. Elimina ácaros, bactérias e odores desagradáveis, purificando o ar para sua família.' 
     },
   ];
 
@@ -244,15 +262,26 @@ const Services = () => {
           {servicos.map((servico, index) => (
             <div 
               key={index} 
-              className="group bg-[#F8FAFC] p-8 rounded-[2rem] hover:bg-slate-900 transition-colors duration-500 flex flex-col h-full"
+              className="group bg-[#F8FAFC] p-6 sm:p-7 rounded-[2rem] hover:bg-slate-900 transition-colors duration-500 flex flex-col h-full border border-slate-200/80 hover:border-slate-700 shadow-sm hover:shadow-xl"
             >
-              <div className="bg-white group-hover:bg-slate-800 p-4 rounded-2xl w-fit shadow-sm mb-8 transition-colors duration-500">
-                {servico.icone}
+              {/* Imagem do Processo */}
+              <div className="relative h-44 rounded-2xl overflow-hidden mb-6 bg-slate-200">
+                <img 
+                  src={servico.fotoProcesso} 
+                  alt={servico.titulo} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-60" />
+                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-slate-900 flex items-center gap-1.5 shadow-sm">
+                  {servico.icone}
+                  <span>{servico.tag}</span>
+                </div>
               </div>
-              <h4 className="text-2xl font-bold text-slate-900 group-hover:text-white mb-4 transition-colors duration-500">
+
+              <h4 className="text-xl font-extrabold text-slate-900 group-hover:text-white mb-3 transition-colors duration-500">
                 {servico.titulo}
               </h4>
-              <p className="text-slate-600 group-hover:text-slate-400 leading-relaxed text-sm flex-grow mb-8 transition-colors duration-500">
+              <p className="text-slate-600 group-hover:text-slate-400 leading-relaxed text-sm flex-grow mb-6 transition-colors duration-500">
                 {servico.desc}
               </p>
               <a 
@@ -273,36 +302,36 @@ const Services = () => {
 const RealWorkGallery = () => {
   const fotosReais = [
     {
+      foto: fotoRodrigo5,
+      titulo: 'Higienização Química com Coletor',
+      subtitulo: 'Evaporadora Residencial',
+      badge: 'Lavagem sob Pressão',
+      desc: 'Desmontagem técnica, isolamento com bolsa impermeável vedada e lavagem sob pressão com bactericida. Zero respingos no piso e ar puro para sua família.',
+      icone: <Droplets className="w-4 h-4 text-cyan-400" />
+    },
+    {
       foto: fotoRodrigo4,
-      titulo: 'Vácuo & Linha Frigorígena',
+      titulo: 'Vácuo Técnico & Manifold',
       subtitulo: 'Condensadora Externa',
       badge: 'Pressão & Estanqueidade',
-      desc: 'Conexão de manifold profissional para teste rigoroso de estanqueidade e vácuo profundo. Garantia de que o gás não vaza e o compressor opera protegido.',
+      desc: 'Aplicação de bomba de vácuo profundo e manômetro manifold para teste rigoroso de estanqueidade. Gás preservado e máxima durabilidade do compressor.',
       icone: <Settings className="w-4 h-4 text-blue-400" />
     },
     {
+      foto: fotoRodrigo6,
+      titulo: 'Instalação em Altura (NR-35)',
+      subtitulo: 'Coberturas & Telhados',
+      badge: 'Segurança & EPI Completo',
+      desc: 'Trabalho em telhados e fachadas com capacete, cinto paraquedista, trava-quedas e ancoragem certificada. Cuidado com o telhado e segurança patrimonial.',
+      icone: <ShieldCheck className="w-4 h-4 text-amber-400" />
+    },
+    {
       foto: fotoRodrigo3,
-      titulo: 'Aferição Térmica a 16°C',
+      titulo: 'Aferição Digital a 16°C',
       subtitulo: 'Samsung WindFree',
       badge: 'Teste de Rendimento',
-      desc: 'Medição digital de temperatura e vazão na saída de ar com sonda de alta sensibilidade. Comprovação prática de eficiência máxima e ar gelando rápido.',
-      icone: <ThermometerSnowflake className="w-4 h-4 text-cyan-400" />
-    },
-    {
-      foto: fotoRodrigo1,
-      titulo: 'Instalação Residencial Perfeita',
-      subtitulo: 'LG Smart Inverter',
-      badge: 'Padrão Sem Sujeira',
-      desc: 'Fixação nivelada, furação com contenção de poeira e tubulação 100% em cobre. Acabamento estético impecável que valoriza a decoração da sua casa.',
-      icone: <Wrench className="w-4 h-4 text-emerald-400" />
-    },
-    {
-      foto: fotoRodrigo2,
-      titulo: 'Atendimento Próximo & Cuidado',
-      subtitulo: 'Respeito ao Cliente',
-      badge: 'Honestidade & Capricho',
-      desc: 'Rodrigo e equipe no local com escadas apropriadas, ferramentas de ponta e proteção do ambiente. A JHS entrega o cômodo perfeitamente limpo.',
-      icone: <ShieldCheck className="w-4 h-4 text-amber-400" />
+      desc: 'Medição com sensor de temperatura e anemômetro direto na saída de ar atingindo 16°C. Comprovação científica de rendimento térmico no ato da entrega.',
+      icone: <ThermometerSnowflake className="w-4 h-4 text-emerald-400" />
     }
   ];
 
@@ -607,18 +636,48 @@ const About = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
         
         <div className="relative">
-          <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border-2 border-slate-800 bg-slate-950">
+          <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border-4 border-slate-800 bg-slate-950 relative group">
             <img 
               src={fotoRodrigo1} 
-              alt="Rodrigo - Responsável Técnico JHS Climatizar" 
-              className="w-full h-full object-cover object-top hover:scale-105 transition-all duration-700"
+              alt="Rodrigo - Fundador e Responsável Técnico da JHS Climatizar" 
+              className="w-full h-full object-cover object-[50%_15%] group-hover:scale-105 transition-all duration-700"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/25 to-transparent" />
+
+            {/* Profile Card do Fundador */}
+            <div className="absolute bottom-5 left-5 right-5 bg-slate-900/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-slate-700/80 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-lg sm:text-xl font-black text-white">Rodrigo</h4>
+                  <p className="text-[11px] sm:text-xs font-bold text-cyan-400 uppercase tracking-wider">Fundador & Responsável Técnico</p>
+                </div>
+                <span className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse" title="Atendimento direto com o especialista" />
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" /> NR-35 (Altura)
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" /> NR-10 (Elétrica)
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Wrench className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> 100% Cobre
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Monte Mor - SP
+                </span>
+              </div>
+            </div>
           </div>
-          {/* Badge de Experiência e Confiança */}
-          <div className="absolute -bottom-6 -right-4 sm:-bottom-8 sm:-right-8 bg-blue-600 rounded-[2rem] p-6 sm:p-8 shadow-2xl border-4 border-slate-900">
-            <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-white mb-2" />
-            <p className="text-3xl sm:text-4xl font-black text-white">+10 Anos</p>
-            <p className="text-blue-200 text-xs sm:text-sm font-medium">de experiência prática</p>
+
+          {/* Selo Flutuante de Confiança */}
+          <div className="absolute -top-4 -right-4 bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-3.5 sm:p-4 rounded-2xl shadow-xl border-2 border-white/20 hidden sm:flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-white" />
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-blue-100">Atendimento Direto</p>
+              <p className="text-xs sm:text-sm font-extrabold">Sem Terceirização</p>
+            </div>
           </div>
         </div>
 
@@ -742,19 +801,22 @@ const LocationSection = () => {
 const Testimonials = () => {
   const avaliacoes = [
     {
-      nome: "Carlos Silva",
-      papel: "Residência",
+      nome: "Carlos Eduardo Silva",
+      papel: "Residencial • Monte Mor",
+      foto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&h=200&q=80",
       texto: "Serviço impecável. A equipe da JHS instalou dois aparelhos em casa, não sujaram nada, usaram aspirador durante o furo e deixaram gelando perfeitamente.",
     },
     {
-      nome: "Mariana Costa",
-      papel: "Clínica de Estética",
-      texto: "Estávamos perdendo clientes pelo calor. A equipe da JHS veio no mesmo dia, achou o vazamento, recarregou o gás e salvou a nossa semana. Recomendo de olhos fechados.",
+      nome: "Dra. Mariana Costa",
+      papel: "Clínica Odonto & Estética • Hortolândia",
+      foto: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&h=200&q=80",
+      texto: "Estávamos perdendo pacientes pelo calor intenso. O Rodrigo veio no mesmo dia, achou o micro-vazamento, recarregou o gás com balança e salvou a nossa semana. Recomendo de olhos fechados.",
     },
     {
       nome: "Roberto Mendes",
-      papel: "Escritório Comercial",
-      texto: "Fechamos contrato de manutenção preventiva com a JHS. Acabou o problema de aparelho pingando água nas mesas e cheiro de mofo. Profissionalismo raro.",
+      papel: "Diretor Comercial • Campinas",
+      foto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&h=200&q=80",
+      texto: "Fechamos contrato de manutenção preventiva com a JHS para todo o escritório. Acabou o problema de aparelho pingando água nas mesas e cheiro de mofo. Profissionalismo raro no mercado.",
     }
   ];
 
@@ -778,12 +840,15 @@ const Testimonials = () => {
               </div>
               <p className="text-slate-700 text-lg leading-relaxed mb-10">"{av.texto}"</p>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-inner">
-                  {av.nome.charAt(0)}
+                <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-blue-500 shadow-md">
+                  <img src={av.foto} alt={av.nome} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h5 className="font-bold text-slate-900">{av.nome}</h5>
-                  <span className="text-sm text-slate-500">{av.papel}</span>
+                  <h5 className="font-bold text-slate-900 flex items-center gap-1.5 text-base">
+                    {av.nome}
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  </h5>
+                  <span className="text-xs text-slate-500">{av.papel}</span>
                 </div>
               </div>
             </div>
