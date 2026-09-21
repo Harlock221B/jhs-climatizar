@@ -21,9 +21,15 @@ import {
   Check,
   Loader2,
   Calculator,
-  MapPin
+  MapPin,
+  Camera
 } from 'lucide-react';
 import { solicitarOrcamentoViaSite } from '../services/db';
+import logoIcon from '../assets/icon/icon.png';
+import fotoRodrigo1 from '../assets/img/rodrigo-1.png';
+import fotoRodrigo2 from '../assets/img/rodrigo-2.png';
+import fotoRodrigo3 from '../assets/img/rodrigo-3.jpeg';
+import fotoRodrigo4 from '../assets/img/rodrigo-4.jpeg';
 
 const WHATSAPP_NUMBER = "5519992327227";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de solicitar um orçamento para ar-condicionado com a equipe da JHS Climatizar.`;
@@ -40,17 +46,20 @@ const Navbar = () => {
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <a href="#" className="flex items-center gap-2 cursor-pointer group">
-          <div className="bg-blue-600 p-2 rounded-xl group-hover:rotate-180 transition-transform duration-700 shadow-md shadow-blue-600/20">
-            <Snowflake className="text-white w-6 h-6" />
+        <a href="#" className="flex items-center gap-3 cursor-pointer group">
+          <div className="w-10 h-10 rounded-xl overflow-hidden p-1 bg-white border border-slate-200/80 shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
+            <img src={logoIcon} alt="JHS Climatizar Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
             JHS<span className="text-blue-600">Climatizar</span>
           </h1>
         </a>
         
-        <div className="hidden lg:flex gap-7 items-center bg-white/70 backdrop-blur-md px-7 py-3 rounded-full border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="hidden lg:flex gap-6 items-center bg-white/70 backdrop-blur-md px-7 py-3 rounded-full border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           <a href="#servicos" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Serviços</a>
+          <a href="#galeria" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1">
+            <Camera className="w-3.5 h-3.5 text-blue-600" /> Fotos Reais
+          </a>
           <a href="#orcamento" className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1.5">
             <Calculator className="w-4 h-4" /> Orçamento Online
           </a>
@@ -151,33 +160,38 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Imagem Desruptiva do Hero */}
-        <div className="relative w-full aspect-square lg:aspect-[4/5] rounded-[3rem] overflow-hidden group shadow-2xl">
-          <div className="absolute inset-0 bg-blue-600 mix-blend-overlay opacity-20 group-hover:opacity-0 transition-opacity duration-700 z-10" />
+        {/* Imagem Real do Hero */}
+        <div className="relative w-full aspect-square lg:aspect-[4/5] rounded-[3rem] overflow-hidden group shadow-2xl border-4 border-white bg-slate-950">
           <img 
-            src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&q=80&w=1200" 
-            alt="Equipe Técnica Especialista JHS Climatizar" 
-            className="w-full h-full object-cover transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
+            src={fotoRodrigo4} 
+            alt="Rodrigo - Especialista JHS Climatizar em Instalação e Teste Manifold" 
+            className="w-full h-full object-cover object-top transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
           
           {/* Floating Badges */}
-          <div className="absolute top-8 -left-4 lg:left-8 z-20 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce" style={{ animationDuration: '3s' }}>
-            <div className="bg-green-100 p-3 rounded-full">
-              <ShieldCheck className="w-6 h-6 text-green-600" />
-            </div>
+          <div className="absolute top-6 left-4 sm:left-6 z-20 bg-white/95 backdrop-blur-md p-3.5 pr-5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-100">
+            <img 
+              src={fotoRodrigo1} 
+              alt="Rodrigo - Responsável Técnico" 
+              className="w-12 h-12 rounded-xl object-cover object-top border-2 border-blue-500 shadow-sm"
+            />
             <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase">Garantia de</p>
-              <p className="text-sm font-extrabold text-slate-900">Serviço Limpo</p>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <p className="text-xs font-black text-slate-900">Rodrigo • Responsável Técnico</p>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">Instalações em Monte Mor e Região</p>
             </div>
           </div>
 
-          <div className="absolute bottom-8 right-8 z-20 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4">
-            <div className="bg-blue-500/20 p-3 rounded-full">
-              <ThermometerSnowflake className="w-6 h-6 text-blue-400" />
+          <div className="absolute bottom-6 right-4 sm:right-6 z-20 bg-slate-900/90 backdrop-blur-md px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700/60">
+            <div className="bg-blue-500/20 p-2.5 rounded-xl">
+              <ThermometerSnowflake className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-sm font-extrabold text-white">Gela de Verdade</p>
-              <p className="text-xs text-blue-200">Sem vazamentos</p>
+              <p className="text-sm font-extrabold text-white">Vácuo & Pressão Manifold</p>
+              <p className="text-xs text-blue-200">100% testado sem vazamentos</p>
             </div>
           </div>
         </div>
@@ -248,6 +262,119 @@ const Services = () => {
               >
                 Solicitar orçamento <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
               </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const RealWorkGallery = () => {
+  const fotosReais = [
+    {
+      foto: fotoRodrigo4,
+      titulo: 'Vácuo & Linha Frigorígena',
+      subtitulo: 'Condensadora Externa',
+      badge: 'Pressão & Estanqueidade',
+      desc: 'Conexão de manifold profissional para teste rigoroso de estanqueidade e vácuo profundo. Garantia de que o gás não vaza e o compressor opera protegido.',
+      icone: <Settings className="w-4 h-4 text-blue-400" />
+    },
+    {
+      foto: fotoRodrigo3,
+      titulo: 'Aferição Térmica a 16°C',
+      subtitulo: 'Samsung WindFree',
+      badge: 'Teste de Rendimento',
+      desc: 'Medição digital de temperatura e vazão na saída de ar com sonda de alta sensibilidade. Comprovação prática de eficiência máxima e ar gelando rápido.',
+      icone: <ThermometerSnowflake className="w-4 h-4 text-cyan-400" />
+    },
+    {
+      foto: fotoRodrigo1,
+      titulo: 'Instalação Residencial Perfeita',
+      subtitulo: 'LG Smart Inverter',
+      badge: 'Padrão Sem Sujeira',
+      desc: 'Fixação nivelada, furação com contenção de poeira e tubulação 100% em cobre. Acabamento estético impecável que valoriza a decoração da sua casa.',
+      icone: <Wrench className="w-4 h-4 text-emerald-400" />
+    },
+    {
+      foto: fotoRodrigo2,
+      titulo: 'Atendimento Próximo & Cuidado',
+      subtitulo: 'Respeito ao Cliente',
+      badge: 'Honestidade & Capricho',
+      desc: 'Rodrigo e equipe no local com escadas apropriadas, ferramentas de ponta e proteção do ambiente. A JHS entrega o cômodo perfeitamente limpo.',
+      icone: <ShieldCheck className="w-4 h-4 text-amber-400" />
+    }
+  ];
+
+  return (
+    <section id="galeria" className="py-28 bg-slate-950 text-white px-6 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-1/4 -left-32 w-80 h-80 bg-blue-600/20 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-0 w-80 h-80 bg-cyan-500/20 blur-[130px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+          <div>
+            <span className="inline-flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-widest text-xs mb-3 bg-cyan-950/60 border border-cyan-800/60 px-3.5 py-1.5 rounded-full">
+              <Camera className="w-3.5 h-3.5" />
+              Galeria de Trabalhos Reais
+            </span>
+            <h3 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+              O trabalho real de quem entende <br />
+              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                de climatização na prática.
+              </span>
+            </h3>
+          </div>
+          <p className="text-slate-400 text-sm md:text-base max-w-md">
+            Nada de fotos genéricas de banco de imagens. Aqui você confere o padrão técnico executado pelo Rodrigo e equipe da JHS Climatizar em residências e empresas de Monte Mor e região.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {fotosReais.map((item, idx) => (
+            <div 
+              key={idx}
+              className="group bg-slate-900/90 rounded-3xl overflow-hidden border border-slate-800 hover:border-blue-500/50 shadow-xl transition-all duration-500 flex flex-col hover:-translate-y-1.5"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden bg-slate-800">
+                <img 
+                  src={item.foto} 
+                  alt={item.titulo} 
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                
+                <div className="absolute top-3.5 left-3.5 bg-slate-900/90 backdrop-blur-md px-3 py-1 rounded-full border border-slate-700/60 flex items-center gap-1.5 text-[11px] font-bold text-white shadow-lg">
+                  {item.icone}
+                  <span>{item.badge}</span>
+                </div>
+
+                <div className="absolute bottom-3.5 left-3.5 right-3.5">
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">
+                    {item.subtitulo}
+                  </span>
+                  <h4 className="text-base font-black text-white leading-snug">
+                    {item.titulo}
+                  </h4>
+                </div>
+              </div>
+
+              <div className="p-5 flex flex-col flex-grow justify-between">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {item.desc}
+                </p>
+                
+                <a 
+                  href={WHATSAPP_LINK}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-blue-400 group-hover:text-cyan-300 transition-colors"
+                >
+                  <span>Agendar atendimento</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
             </div>
           ))}
         </div>
@@ -480,18 +607,18 @@ const About = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
         
         <div className="relative">
-          <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl">
+          <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border-2 border-slate-800 bg-slate-950">
             <img 
-              src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&q=80&w=800" 
-              alt="JHS Climatizar - Empresa de Climatização" 
-              className="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+              src={fotoRodrigo1} 
+              alt="Rodrigo - Responsável Técnico JHS Climatizar" 
+              className="w-full h-full object-cover object-top hover:scale-105 transition-all duration-700"
             />
           </div>
-          {/* Badge de Experiência */}
-          <div className="absolute -bottom-8 -right-8 bg-blue-600 rounded-[2rem] p-8 shadow-2xl border-4 border-slate-900">
-            <Wind className="w-10 h-10 text-white mb-2" />
-            <p className="text-4xl font-extrabold text-white">Anos</p>
-            <p className="text-blue-200 font-medium">de experiência no setor</p>
+          {/* Badge de Experiência e Confiança */}
+          <div className="absolute -bottom-6 -right-4 sm:-bottom-8 sm:-right-8 bg-blue-600 rounded-[2rem] p-6 sm:p-8 shadow-2xl border-4 border-slate-900">
+            <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-white mb-2" />
+            <p className="text-3xl sm:text-4xl font-black text-white">+10 Anos</p>
+            <p className="text-blue-200 text-xs sm:text-sm font-medium">de experiência prática</p>
           </div>
         </div>
 
@@ -503,15 +630,15 @@ const About = () => {
             </h3>
           </div>
           
-          <div className="space-y-6 text-slate-300 text-lg leading-relaxed">
+          <div className="space-y-6 text-slate-300 text-base sm:text-lg leading-relaxed">
             <p>
-              A <strong>JHS Climatizar</strong> é uma empresa consolidada na prestação de serviços de instalação, manutenção corretiva, planos preventivos e higienização bactericida de aparelhos de ar-condicionado.
+              A <strong>JHS Climatizar</strong> é uma empresa sediada em <strong>Monte Mor - SP</strong>, liderada pelo especialista técnico <strong>Rodrigo</strong>, com atuação de destaque em toda a Região Metropolitana de Campinas (RMC).
             </p>
             <p>
-              Nosso objetivo é simples: <strong>entregar tranquilidade e o clima perfeito para sua residência ou empresa</strong>, sem poeira espalhada, sem gambiarras e com garantia real documentada.
+              Nosso compromisso inegociável é: <strong>entregar tranquilidade e climatização de verdade para sua residência ou empresa</strong>, sem poeira espalhada, sem gambiarras e com garantia real documentada em cada serviço.
             </p>
-            <p className="text-base text-slate-400">
-              Utilizamos tubulação 100% em cobre, teste de estanqueidade contra vazamentos e bomba de vácuo em todos os procedimentos, preservando a vida útil e a economia de energia do seu equipamento.
+            <p className="text-sm sm:text-base text-slate-400">
+              Trabalhamos exclusivamente com tubulação 100% de cobre, vácuo profundo aferido, teste de estanqueidade contra vazamentos e materiais de primeira linha, assegurando o menor consumo elétrico e a máxima vida útil do seu ar-condicionado.
             </p>
           </div>
           
@@ -782,24 +909,47 @@ const Footer = () => {
   return (
     <footer className="bg-slate-950 pt-20 pb-10 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-10 mb-10 gap-8">
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-600 p-2 rounded-xl">
-            <Snowflake className="text-white w-6 h-6" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl overflow-hidden p-1 bg-white/10 border border-white/10 flex items-center justify-center">
+            <img src={logoIcon} alt="JHS Climatizar Logo" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl font-black text-white tracking-tight">
             JHS<span className="text-blue-500">Climatizar</span>
           </h2>
         </div>
-        <p className="text-slate-400 font-medium">
-          Monte Mor - SP • Campinas e Região
-        </p>
+
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-blue-400" />
+            Monte Mor - SP • Campinas e Região
+          </span>
+          <a 
+            href={WHATSAPP_LINK}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1.5 text-slate-300 hover:text-emerald-400 transition-colors"
+          >
+            <Phone className="w-4 h-4 text-emerald-400" />
+            (19) 99232-7227
+          </a>
+          <a 
+            href="https://instagram.com/RODRIGO_JHSCLIMATIZAR"
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1.5 text-slate-300 hover:text-pink-400 transition-colors"
+          >
+            <Instagram className="w-4 h-4 text-pink-400" />
+            @RODRIGO_JHSCLIMATIZAR
+          </a>
+        </div>
       </div>
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm gap-4">
-        <p>© {new Date().getFullYear()} JHS Climatizar. Todos os direitos reservados.</p>
+        <p>© {new Date().getFullYear()} JHS Climatizar. Todos os direitos reservados. CNPJ & Garantia Documentada.</p>
         <a 
           href="/login" 
-          className="text-slate-600 hover:text-slate-400 text-xs flex items-center gap-1 transition-colors"
+          className="text-slate-600 hover:text-slate-400 text-xs flex items-center gap-1.5 transition-colors font-semibold"
         >
+          <Lock className="w-3 h-3 text-slate-500" />
           Área do Profissional
         </a>
       </div>
@@ -831,6 +981,7 @@ export default function Home() {
       <main>
         <Hero />
         <Services />
+        <RealWorkGallery />
         <QuoteRequestSection />
         <About />
         <LocationSection />

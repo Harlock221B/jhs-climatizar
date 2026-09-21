@@ -16,6 +16,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import logoIcon from '../assets/icon/icon.png';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -49,8 +50,8 @@ export default function AdminLayout() {
       {/* ======================================================== */}
       <header className="md:hidden bg-slate-900/95 backdrop-blur-md text-white p-3.5 px-4 flex items-center justify-between sticky top-0 z-40 border-b border-slate-800 shadow-md">
         <div className="flex items-center gap-2.5">
-          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2 rounded-xl shadow-md shadow-blue-500/20">
-            <Snowflake className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl overflow-hidden p-1 bg-white/10 border border-white/10 shadow-md flex items-center justify-center">
+            <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-black text-base tracking-tight leading-tight block">JHS Climatizar</span>
@@ -144,8 +145,8 @@ export default function AdminLayout() {
       {/* ======================================================== */}
       <aside className="w-72 bg-slate-900 text-slate-300 flex flex-col hidden md:flex sticky top-0 h-screen shrink-0 border-r border-slate-800/90 shadow-xl">
         <div className="p-6 pb-4 flex items-center gap-3">
-          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2.5 rounded-2xl shadow-lg shadow-blue-500/20">
-            <Snowflake className="w-6 h-6 text-white" />
+          <div className="w-11 h-11 rounded-2xl overflow-hidden p-1 bg-white/10 border border-white/15 shadow-lg flex items-center justify-center">
+            <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain" />
           </div>
           <div>
             <h2 className="text-xl font-black text-white leading-tight tracking-tight">JHS Climatizar</h2>

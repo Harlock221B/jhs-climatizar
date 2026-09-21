@@ -17,6 +17,7 @@ import {
   Layers,
   Sparkles
 } from 'lucide-react';
+import logoIcon from '../assets/icon/icon.png';
 
 export default function OrcamentoPDFModal({ orcamento, onClose }) {
   if (!orcamento) return null;
@@ -102,8 +103,8 @@ export default function OrcamentoPDFModal({ orcamento, onClose }) {
           {/* Cabeçalho da Empresa */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-900 pb-6 mb-8 gap-4">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-3 rounded-2xl text-white shadow-md">
-                <Snowflake className="w-8 h-8" />
+              <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-blue-50 border border-blue-100 p-1 shrink-0">
+                <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">

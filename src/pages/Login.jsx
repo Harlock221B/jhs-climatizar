@@ -4,6 +4,7 @@ import { Snowflake, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import logoIcon from '../assets/icon/icon.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -57,8 +58,8 @@ export default function Login() {
 
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-8 sm:p-10 rounded-[2rem] shadow-2xl relative z-10">
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-blue-600 p-3 rounded-2xl mb-4 shadow-lg shadow-blue-600/30">
-            <Snowflake className="w-8 h-8 text-white" />
+          <div className="w-20 h-20 rounded-2xl overflow-hidden p-2 bg-white/10 border border-white/20 mb-4 shadow-xl shadow-blue-600/30 flex items-center justify-center backdrop-blur-md">
+            <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain drop-shadow-md" />
           </div>
           <h2 className="text-3xl font-extrabold text-white">Área Restrita</h2>
           <p className="text-slate-400 mt-2 text-center text-sm">
