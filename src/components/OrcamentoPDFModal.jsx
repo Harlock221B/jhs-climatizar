@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   Printer, 
@@ -15,14 +15,19 @@ import {
   Zap,
   CreditCard,
   Layers,
-  Sparkles
+  Sparkles,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import logoIcon from '../assets/icon/icon.png';
 
 export default function OrcamentoPDFModal({ orcamento, onClose }) {
+  const [detalharValores, setDetalharValores] = useState(true);
+  
   if (!orcamento) return null;
 
   const valorTotal = Number(orcamento.valor || 0);
+  const temDetalhes = orcamento.valorMaoObra || orcamento.valorCobre || orcamento.valorSuporte || orcamento.valorExtras;
 
   // Cálculo de desconto no PIX
   let percentualPix = 0;
@@ -39,7 +44,16 @@ export default function OrcamentoPDFModal({ orcamento, onClose }) {
       ? `\n• *PIX com Desconto:* R$ ${valorComPix.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${orcamento.descontoPix})` 
       : '';
     const capInfo = orcamento.capacidade ? `\n• *Equipamento:* ${orcamento.capacidade} ${orcamento.tecnologia || ''} (${orcamento.voltagem || '220V'})` : '';
-    const matInfo = orcamento.metragemCobre ? `\n• *Materiais:* ${orcamento.metragemCobre}` : '';
+    
+    let materiaisDetalhados = '';
+    if (detalharValores && temDetalhes) {
+      if (orcamento.valorCobre) materiaisDetalhados += `\n  - Tubulação Cobre: R$ ${Number(orcamento.valorCobre).toFixed(2)}`;
+      if (orcamento.valorSuporte) materiaisDetalhados += `\n  - Suporte: R$ ${Number(orcamento.valorSuporte).toFixed(2)}`;
+      if (orcamento.valorExtras) materiaisDetalhados += `\n  - Outros Insumos: R$ ${Number(orcamento.valorExtras).toFixed(2)}`;
+      if (orcamento.valorMaoObra) materiaisDetalhados += `\n  - Mão de Obra: R$ ${Number(orcamento.valorMaoObra).toFixed(2)}`;
+    }
+
+    const matInfo = orcamento.metragemCobre ? `\n• *Materiais:* ${orcamento.metragemCobre}${materiaisDetalhados}` : '';
     const supInfo = orcamento.suporteCondensadora ? `\n• *Suporte Externo:* ${orcamento.suporteCondensadora}` : '';
     const garInfo = orcamento.prazoGarantia ? `\n• *Garantia:* ${orcamento.prazoGarantia}` : '';
     const pagInfo = orcamento.condicaoCartao ? `\n• *Cartão:* ${orcamento.condicaoCartao}` : '';
@@ -60,13 +74,24 @@ export default function OrcamentoPDFModal({ orcamento, onClose }) {
       <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden my-6 border border-slate-200 flex flex-col">
         
         {/* Barra Superior de Ações (Oculta na Impressão via CSS) */}
-        <div className="print:hidden bg-slate-900 text-white p-4 px-6 flex items-center justify-between border-b border-slate-800">
+        <div className="print:hidden bg-slate-900 text-white p-4 px-6 flex items-center justify-between border-b border-slate-800 flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <FileCheck className="w-5 h-5 text-blue-400" />
             <span className="font-bold text-sm">Visualização de Proposta & Garantia</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {temDetalhes && (
+              <button 
+                onClick={() => setDetalharValores(!detalharValores)}
+                className={`flex items-center gap-1.5 text-xs font-bold py-2 px-3.5 rounded-xl transition-all shadow-sm ${detalharValores ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'}`}
+                title="Mostrar/Ocultar preços detalhados de material"
+              >
+                {detalharValores ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                <span>{detalharValores ? 'Ocultar Detalhes' : 'Detalhar Valores'}</span>
+              </button>
+            )}
+
             <button 
               onClick={handleSendWhatsApp}
               className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl transition-all shadow-sm"
@@ -241,6 +266,38 @@ export default function OrcamentoPDFModal({ orcamento, onClose }) {
                         <span><strong>Furação Limpa:</strong> perfuração em alvenaria com aspiração de poeira contínua.</span>
                       </li>
                     </ul>
+
+                    {detalharValores && temDetalhes && (
+                      <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">Composição dos Valores</p>
+                        <div className="space-y-1 text-[11px]">
+                          {orcamento.valorCobre && (
+                            <div className="flex justify-between">
+                              <span>Infraestrutura / Cobre:</span>
+                              <span className="font-semibold text-slate-700">R$ {Number(orcamento.valorCobre).toFixed(2)}</span>
+                            </div>
+                          )}
+                          {orcamento.valorSuporte && (
+                            <div className="flex justify-between">
+                              <span>Suporte Condensadora:</span>
+                              <span className="font-semibold text-slate-700">R$ {Number(orcamento.valorSuporte).toFixed(2)}</span>
+                            </div>
+                          )}
+                          {orcamento.valorExtras && (
+                            <div className="flex justify-between">
+                              <span>Materiais Extras:</span>
+                              <span className="font-semibold text-slate-700">R$ {Number(orcamento.valorExtras).toFixed(2)}</span>
+                            </div>
+                          )}
+                          {orcamento.valorMaoObra && (
+                            <div className="flex justify-between">
+                              <span>Mão de Obra Especializada:</span>
+                              <span className="font-semibold text-slate-700">R$ {Number(orcamento.valorMaoObra).toFixed(2)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </td>
 
                   <td className="p-4 pr-4 font-extrabold text-slate-900 text-base text-right align-top whitespace-nowrap">

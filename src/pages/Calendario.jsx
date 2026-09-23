@@ -16,6 +16,7 @@ import {
   Columns3,
   CalendarRange
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   format, 
   addDays, 
@@ -34,36 +35,121 @@ import {
   isToday 
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { subscribeAgendamentos, addAgendamento, updateAgendamentoStatus, deleteAgendamento } from '../services/db';
+import { subscribeAgendamentos, addAgendamento, updateAgendamentoStatus, deleteAgendamento, subscribeClientes, addCliente } from '../services/db';
+import { generateGoogleCalendarLink } from '../utils/googleCalendar';
 
 export default function Calendario() {
+  const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState('semana'); // 'dia' | 'semana' | 'mes'
   const [agendamentos, setAgendamentos] = useState([]);
+  const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingClient, setSavingClient] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
     cliente: '',
+    telefone: '',
     servico: 'Instalação de Ar-Condicionado',
     endereco: '',
     data: new Date().toISOString().split('T')[0],
     hora: '09:00',
     status: 'confirmado'
   });
+  const [newClientData, setNewClientData] = useState({ nome: '', telefone: '', email: '', endereco: '' });
 
   useEffect(() => {
-    const unsubscribe = subscribeAgendamentos((data) => {
+    const unsubscribeAg = subscribeAgendamentos((data) => {
       setAgendamentos(data);
       setLoading(false);
     }, () => {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    const unsubscribeCli = subscribeClientes((data) => {
+      setClientes(data);
+    }, (err) => console.error("Erro ao carregar clientes", err));
+
+    return () => {
+      unsubscribeAg();
+      unsubscribeCli();
+    };
   }, []);
+
+  useEffect(() => {
+    const clienteId = searchParams.get('clienteId');
+    if (clienteId && clientes.length > 0) {
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        setFormData(prev => ({
+          ...prev,
+          cliente: cliente.nome,
+          telefone: cliente.telefone || '',
+          endereco: cliente.endereco || ''
+        }));
+        setModalOpen(true);
+      }
+    }
+  }, [searchParams, clientes]);
+
+  const handleClientSelect = (e) => {
+    const clienteId = e.target.value;
+    if (clienteId === 'NEW') {
+      setNewClientModalOpen(true);
+      return;
+    }
+    
+    if (clienteId) {
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        setFormData(prev => ({
+          ...prev,
+          cliente: cliente.nome,
+          telefone: cliente.telefone || '',
+          endereco: cliente.endereco || ''
+        }));
+      }
+    } else {
+       setFormData(prev => ({
+          ...prev,
+          cliente: '',
+          telefone: '',
+          endereco: ''
+        }));
+    }
+  };
+
+  const handleSaveNewClient = async (e) => {
+    e.preventDefault();
+    if (!newClientData.nome.trim()) return;
+    setSavingClient(true);
+    try {
+      const docRef = await addCliente({
+        ...newClientData,
+        totalServicos: 1,
+        aparelho: 'Não informado',
+        dataUltimoServico: new Date().toISOString().split('T')[0]
+      });
+      
+      setFormData(prev => ({
+        ...prev,
+        cliente: newClientData.nome,
+        telefone: newClientData.telefone || '',
+        endereco: newClientData.endereco || ''
+      }));
+
+      setNewClientModalOpen(false);
+      setNewClientData({ nome: '', telefone: '', email: '', endereco: '' });
+    } catch (err) {
+      alert("Erro ao criar cliente");
+    } finally {
+      setSavingClient(false);
+    }
+  };
 
   // Navegação do Calendário baseado no Modo Atual
   const handlePrev = () => {
@@ -306,7 +392,16 @@ export default function Calendario() {
                                     )}
                                   </div>
 
-                                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap mt-2 sm:mt-0">
+                                    <a
+                                      href={generateGoogleCalendarLink(app)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="px-3 py-1 rounded-lg text-xs font-bold border bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200 transition-colors flex items-center gap-1"
+                                      title="Adicionar ao Google Agenda"
+                                    >
+                                      <CalendarIcon className="w-3.5 h-3.5" /> Google Agenda
+                                    </a>
                                     <button 
                                       onClick={() => handleToggleStatus(app.id, app.status)}
                                       className={`px-3 py-1 rounded-lg text-xs font-bold border transition-colors ${
@@ -571,10 +666,18 @@ export default function Calendario() {
                               )}
                             </div>
 
-                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                              <a
+                                href={generateGoogleCalendarLink(app)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                              >
+                                <CalendarIcon className="w-3 h-3" /> Agenda
+                              </a>
                               <button 
                                 onClick={() => handleToggleStatus(app.id, app.status)}
-                                className="text-xs font-bold text-slate-600 hover:text-blue-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="text-[10px] font-bold text-slate-600 hover:text-blue-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
                               >
                                 Alternar Status
                               </button>
@@ -612,14 +715,21 @@ export default function Calendario() {
             <form onSubmit={handleAddAgendamento} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nome do Cliente *</label>
-                <input 
-                  type="text" 
+                <select 
                   required
-                  value={formData.cliente}
-                  onChange={(e) => setFormData({...formData, cliente: e.target.value})}
-                  placeholder="Ex: Maria Oliveira"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-                />
+                  value={clientes.find(c => c.nome === formData.cliente)?.id || (formData.cliente ? formData.cliente : '')}
+                  onChange={handleClientSelect}
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                >
+                  <option value="" disabled>Selecione um cliente...</option>
+                  <option value="NEW" className="font-bold text-blue-600 bg-blue-50">+ Cadastrar Novo Cliente</option>
+                  {clientes.map(cli => (
+                    <option key={cli.id} value={cli.id}>{cli.nome}</option>
+                  ))}
+                </select>
+                {formData.cliente && !clientes.find(c => c.nome === formData.cliente) && (
+                  <p className="text-xs text-amber-600 mt-1">Cliente manual mantido: {formData.cliente}</p>
+                )}
               </div>
 
               <div>
@@ -682,6 +792,66 @@ export default function Calendario() {
                   className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md disabled:bg-blue-400 text-sm"
                 >
                   {saving ? 'Agendando...' : 'Salvar no Firebase'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Quick Add Cliente */}
+      {newClientModalOpen && (
+        <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800">Cadastrar Novo Cliente</h3>
+              <button onClick={() => setNewClientModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveNewClient} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Nome Completo *</label>
+                <input 
+                  type="text" required
+                  value={newClientData.nome}
+                  onChange={e => setNewClientData({...newClientData, nome: e.target.value})}
+                  className="w-full px-4 py-2 border rounded-xl text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Telefone (WhatsApp)</label>
+                <input 
+                  type="text" 
+                  value={newClientData.telefone}
+                  onChange={e => setNewClientData({...newClientData, telefone: e.target.value})}
+                  className="w-full px-4 py-2 border rounded-xl text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Endereço Principal</label>
+                <input 
+                  type="text" 
+                  value={newClientData.endereco}
+                  onChange={e => setNewClientData({...newClientData, endereco: e.target.value})}
+                  className="w-full px-4 py-2 border rounded-xl text-sm"
+                />
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setNewClientModalOpen(false)}
+                  className="px-4 py-2 border text-slate-600 rounded-xl hover:bg-slate-50 text-sm font-bold"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={savingClient}
+                  className="px-5 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-md disabled:bg-blue-400 text-sm"
+                >
+                  {savingClient ? 'Salvando...' : 'Salvar Cliente'}
                 </button>
               </div>
             </form>

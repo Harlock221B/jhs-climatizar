@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   FileText, 
   Plus, 
@@ -25,7 +26,9 @@ import {
   addOrcamento, 
   updateOrcamentoStatus, 
   updateOrcamentoValor, 
-  deleteOrcamento 
+  deleteOrcamento,
+  subscribeClientes,
+  addCliente
 } from '../services/db';
 import OrcamentoPDFModal from '../components/OrcamentoPDFModal';
 
@@ -47,6 +50,11 @@ const DEFAULT_FORM_DATA = {
   suporteCondensadora: 'Incluso (suporte em aço galvanizado)',
   pontoEletricoDreno: 'Ponto 220V e dreno por conta do cliente',
   tempoEstimado: '3 a 4 horas',
+  // Preços Detalhados
+  valorMaoObra: '',
+  valorCobre: '',
+  valorSuporte: '',
+  valorExtras: '',
   // 3. Pagamento & Garantia
   descontoPix: '5% de desconto',
   condicaoCartao: 'Em até 12x no cartão de crédito',
@@ -56,18 +64,23 @@ const DEFAULT_FORM_DATA = {
 };
 
 export default function Orcamentos() {
+  const [searchParams] = useSearchParams();
   const [orcamentos, setOrcamentos] = useState([]);
+  const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingClient, setSavingClient] = useState(false);
   const [selectedForPDF, setSelectedForPDF] = useState(null);
 
   // Form State
   const [formData, setFormData] = useState(DEFAULT_FORM_DATA);
+  const [newClientData, setNewClientData] = useState({ nome: '', telefone: '', email: '', endereco: '' });
 
   useEffect(() => {
-    const unsubscribe = subscribeOrcamentos((data) => {
+    const unsubscribeOrc = subscribeOrcamentos((data) => {
       setOrcamentos(data);
       setLoading(false);
     }, (err) => {
@@ -75,8 +88,86 @@ export default function Orcamentos() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    const unsubscribeCli = subscribeClientes((data) => {
+      setClientes(data);
+    }, (err) => console.error("Erro ao carregar clientes", err));
+
+    return () => {
+      unsubscribeOrc();
+      unsubscribeCli();
+    };
   }, []);
+
+  useEffect(() => {
+    const clienteId = searchParams.get('clienteId');
+    if (clienteId && clientes.length > 0) {
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        setFormData(prev => ({
+          ...prev,
+          cliente: cliente.nome,
+          telefone: cliente.telefone || '',
+          cidade: cliente.endereco || ''
+        }));
+        setModalOpen(true);
+      }
+    }
+  }, [searchParams, clientes]);
+
+  const handleClientSelect = (e) => {
+    const clienteId = e.target.value;
+    if (clienteId === 'NEW') {
+      setNewClientModalOpen(true);
+      return;
+    }
+    
+    if (clienteId) {
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        setFormData(prev => ({
+          ...prev,
+          cliente: cliente.nome,
+          telefone: cliente.telefone || '',
+          cidade: cliente.endereco || ''
+        }));
+      }
+    } else {
+       setFormData(prev => ({
+          ...prev,
+          cliente: '',
+          telefone: '',
+          cidade: ''
+        }));
+    }
+  };
+
+  const handleSaveNewClient = async (e) => {
+    e.preventDefault();
+    if (!newClientData.nome.trim()) return;
+    setSavingClient(true);
+    try {
+      const docRef = await addCliente({
+        ...newClientData,
+        totalServicos: 1,
+        aparelho: formData.capacidade + ' ' + formData.tecnologia,
+        dataUltimoServico: new Date().toISOString().split('T')[0]
+      });
+      
+      setFormData(prev => ({
+        ...prev,
+        cliente: newClientData.nome,
+        telefone: newClientData.telefone || '',
+        cidade: newClientData.endereco || ''
+      }));
+
+      setNewClientModalOpen(false);
+      setNewClientData({ nome: '', telefone: '', email: '', endereco: '' });
+    } catch (err) {
+      alert("Erro ao criar cliente");
+    } finally {
+      setSavingClient(false);
+    }
+  };
 
   const handleAddOrcamento = async (e) => {
     e.preventDefault();
@@ -144,7 +235,15 @@ export default function Orcamentos() {
       ? ` (ou à vista no PIX com ${orc.descontoPix})` 
       : '';
     const capInfo = orc.capacidade ? `\n• *Equipamento:* ${orc.capacidade} ${orc.tecnologia || ''} (${orc.voltagem || '220V'})` : '';
-    const matInfo = orc.metragemCobre ? `\n• *Escopo de Materiais:* ${orc.metragemCobre}` : '';
+    
+    // Add detailed materials if they exist
+    let materiaisDetalhados = '';
+    if (orc.valorCobre) materiaisDetalhados += `\n  - Tubulação Cobre: R$ ${Number(orc.valorCobre).toFixed(2)}`;
+    if (orc.valorSuporte) materiaisDetalhados += `\n  - Suporte: R$ ${Number(orc.valorSuporte).toFixed(2)}`;
+    if (orc.valorExtras) materiaisDetalhados += `\n  - Outros Insumos: R$ ${Number(orc.valorExtras).toFixed(2)}`;
+    if (orc.valorMaoObra) materiaisDetalhados += `\n  - Mão de Obra: R$ ${Number(orc.valorMaoObra).toFixed(2)}`;
+
+    const matInfo = orc.metragemCobre ? `\n• *Escopo de Materiais:* ${orc.metragemCobre}${materiaisDetalhados}` : '';
     const supInfo = orc.suporteCondensadora ? `\n• *Suporte Externo:* ${orc.suporteCondensadora}` : '';
     const garInfo = orc.prazoGarantia ? `\n• *Garantia:* ${orc.prazoGarantia}` : '';
     const pagInfo = orc.condicaoCartao ? `\n• *Pagamento:* ${orc.condicaoCartao}${pixDesc}` : '';
@@ -514,19 +613,21 @@ export default function Orcamentos() {
                   <Phone className="w-4 h-4 text-blue-600" />
                   <span>1. Dados do Cliente & Local</span>
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Nome do Cliente ou Empresa *</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Selecione o Cliente *</label>
+                  <select 
                     required
-                    value={formData.cliente}
-                    onChange={(e) => setFormData({...formData, cliente: e.target.value})}
-                    placeholder="Ex: Carlos Oliveira ou Clínica Médica Sorriso"
+                    value={clientes.find(c => c.nome === formData.cliente)?.id || ''}
+                    onChange={handleClientSelect}
                     className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-                  />
+                  >
+                    <option value="">Selecione um cliente...</option>
+                    <option value="NEW" className="font-bold text-blue-600">+ CADASTRAR NOVO CLIENTE</option>
+                    {clientes.map(c => (
+                      <option key={c.id} value={c.id}>{c.nome} - {c.cidade}</option>
+                    ))}
+                  </select>
                 </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-600 mb-1">Telefone / WhatsApp</label>
@@ -698,12 +799,71 @@ export default function Orcamentos() {
               <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/60 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
                   <CreditCard className="w-4 h-4 text-blue-600" />
-                  <span>4. Valores, Pagamento & Garantia</span>
+                  <span>4. Valores & Precificação Detalhada</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Valor Total (R$) *</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Mão de Obra (R$)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      value={formData.valorMaoObra}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const total = (parseFloat(v||0) + parseFloat(formData.valorCobre||0) + parseFloat(formData.valorSuporte||0) + parseFloat(formData.valorExtras||0)).toFixed(2);
+                        setFormData({...formData, valorMaoObra: v, valor: total});
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Tubulação Cobre (R$)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      value={formData.valorCobre}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const total = (parseFloat(formData.valorMaoObra||0) + parseFloat(v||0) + parseFloat(formData.valorSuporte||0) + parseFloat(formData.valorExtras||0)).toFixed(2);
+                        setFormData({...formData, valorCobre: v, valor: total});
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Suporte (R$)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      value={formData.valorSuporte}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const total = (parseFloat(formData.valorMaoObra||0) + parseFloat(formData.valorCobre||0) + parseFloat(v||0) + parseFloat(formData.valorExtras||0)).toFixed(2);
+                        setFormData({...formData, valorSuporte: v, valor: total});
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Outros Materiais (R$)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      value={formData.valorExtras}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const total = (parseFloat(formData.valorMaoObra||0) + parseFloat(formData.valorCobre||0) + parseFloat(formData.valorSuporte||0) + parseFloat(v||0)).toFixed(2);
+                        setFormData({...formData, valorExtras: v, valor: total});
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-200/60 pt-4 mt-2">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Valor Total Consolidado (R$) *</label>
                     <input 
                       type="number" 
                       step="0.01"
@@ -826,6 +986,40 @@ export default function Orcamentos() {
           orcamento={selectedForPDF} 
           onClose={() => setSelectedForPDF(null)} 
         />
+      )}
+
+      {/* Modal Adicionar Novo Cliente Rápido */}
+      {newClientModalOpen && (
+        <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800">Novo Cliente Rápido</h3>
+              <button onClick={() => setNewClientModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveNewClient} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Nome Completo *</label>
+                <input type="text" required value={newClientData.nome} onChange={(e) => setNewClientData({...newClientData, nome: e.target.value})} className="w-full px-4 py-2 border rounded-xl" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">WhatsApp</label>
+                  <input type="text" value={newClientData.telefone} onChange={(e) => setNewClientData({...newClientData, telefone: e.target.value})} className="w-full px-4 py-2 border rounded-xl" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Cidade / Bairro</label>
+                  <input type="text" value={newClientData.endereco} onChange={(e) => setNewClientData({...newClientData, endereco: e.target.value})} className="w-full px-4 py-2 border rounded-xl" />
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end gap-3">
+                <button type="button" onClick={() => setNewClientModalOpen(false)} className="px-4 py-2 border rounded-xl text-slate-600">Cancelar</button>
+                <button type="submit" disabled={savingClient} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">{savingClient ? 'Salvando...' : 'Salvar Cliente'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

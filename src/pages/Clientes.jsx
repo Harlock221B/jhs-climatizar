@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   Users, 
   Search, 
@@ -15,12 +15,15 @@ import {
   Send, 
   BellRing, 
   CheckCircle2, 
-  AlertTriangle 
+  AlertTriangle,
+  FileText,
+  CalendarDays
 } from 'lucide-react';
 import { subscribeClientes, addCliente, deleteCliente } from '../services/db';
 
 export default function Clientes() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -354,7 +357,26 @@ export default function Clientes() {
                       </div>
                     )}
 
-                    <div className="flex gap-2">
+                      <div className="flex gap-2 w-full mt-3">
+                        <button 
+                          onClick={() => navigate(`/orcamentos?clienteId=${cliente.id}`)}
+                          className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm border border-blue-100 hover:border-transparent"
+                          title="Criar Novo Orçamento"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Orçamento
+                        </button>
+                        <button 
+                          onClick={() => navigate(`/calendario?clienteId=${cliente.id}`)}
+                          className="flex-1 bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm border border-purple-100 hover:border-transparent"
+                          title="Agendar Visita"
+                        >
+                          <CalendarDays className="w-3.5 h-3.5" />
+                          Agendar
+                        </button>
+                      </div>
+
+                    <div className="flex gap-2 mt-2">
                       <a 
                         href={`https://wa.me/55${cliente.telefone?.replace(/\D/g, '')}`}
                         target="_blank"
