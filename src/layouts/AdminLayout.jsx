@@ -43,12 +43,12 @@ export default function AdminLayout() {
   const userInitial = currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'J';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-blue-50/20 flex flex-col md:flex-row antialiased selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-blue-50/20 flex flex-col md:flex-row antialiased selection:bg-blue-500 selection:text-white print:min-h-0 print:bg-white print:block">
       
       {/* ======================================================== */}
       {/* CABEÇALHO MOBILE (COMPACTO & ORGÂNICO)                   */}
       {/* ======================================================== */}
-      <header className="md:hidden bg-slate-900/95 backdrop-blur-md text-white p-3.5 px-4 flex items-center justify-between sticky top-0 z-40 border-b border-slate-800 shadow-md">
+      <header className="md:hidden bg-slate-900/95 backdrop-blur-md text-white p-3.5 px-4 flex items-center justify-between sticky top-0 z-40 border-b border-slate-800 shadow-md print:hidden">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl overflow-hidden p-1 bg-white/10 border border-white/10 shadow-md flex items-center justify-center">
             <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain" />
@@ -143,7 +143,7 @@ export default function AdminLayout() {
       {/* ======================================================== */}
       {/* DESKTOP SIDEBAR ELEGANTE                                 */}
       {/* ======================================================== */}
-      <aside className="w-72 bg-slate-900 text-slate-300 flex flex-col hidden md:flex sticky top-0 h-screen shrink-0 border-r border-slate-800/90 shadow-xl">
+      <aside className="w-72 bg-slate-900 text-slate-300 flex flex-col hidden md:flex sticky top-0 h-screen shrink-0 border-r border-slate-800/90 shadow-xl print:hidden">
         <div className="p-6 pb-4 flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl overflow-hidden p-1 bg-white/10 border border-white/15 shadow-lg flex items-center justify-center">
             <img src={logoIcon} alt="JHS Climatizar" className="w-full h-full object-contain" />
@@ -215,9 +215,9 @@ export default function AdminLayout() {
       {/* ======================================================== */}
       {/* ÁREA DE CONTEÚDO PRINCIPAL                               */}
       {/* ======================================================== */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+      <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden print:min-h-0 print:overflow-visible print:block print:p-0">
         {/* Desktop Topbar */}
-        <header className="hidden md:flex bg-white/80 backdrop-blur-md border-b border-slate-200/80 h-20 items-center justify-between px-8 lg:px-12 shrink-0 sticky top-0 z-20 shadow-sm">
+        <header className="hidden md:flex bg-white/80 backdrop-blur-md border-b border-slate-200/80 h-20 items-center justify-between px-8 lg:px-12 shrink-0 sticky top-0 z-20 shadow-sm print:hidden">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-slate-800">
               {menuItems.find(i => i.path === location.pathname)?.label || 'Painel'}
@@ -246,7 +246,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Dynamic Content (Com padding extra na base para o dock mobile) */}
-        <div className="p-4 sm:p-6 lg:p-10 flex-1 overflow-y-auto pb-28 md:pb-10 max-w-7xl w-full mx-auto">
+        <div className="p-4 sm:p-6 lg:p-10 flex-1 overflow-y-auto pb-28 md:pb-10 max-w-7xl w-full mx-auto print:p-0 print:m-0 print:max-w-none print:w-full print:overflow-visible">
           <Outlet />
         </div>
       </main>
@@ -254,7 +254,7 @@ export default function AdminLayout() {
       {/* ======================================================== */}
       {/* DOCK BAR MOBILE FIXO INFERIOR (EXPERIÊNCIA DE APLICATIVO) */}
       {/* ======================================================== */}
-      <nav className="md:hidden fixed bottom-3 left-3 right-3 z-40 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-1.5 shadow-2xl flex items-center justify-around">
+      <nav className="md:hidden fixed bottom-3 left-3 right-3 z-40 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-1.5 shadow-2xl flex items-center justify-around print:hidden">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (

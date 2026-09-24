@@ -76,6 +76,10 @@ export const updateOrcamentoValor = async (id, valor) => {
   return await updateDoc(doc(db, 'orcamentos', id), { valor: Number(valor) });
 };
 
+export const updateOrcamento = async (id, data) => {
+  return await updateDoc(doc(db, 'orcamentos', id), data);
+};
+
 export const deleteOrcamento = async (id) => {
   return await deleteDoc(doc(db, 'orcamentos', id));
 };
@@ -141,6 +145,10 @@ export const addAgendamento = async (agendamentoData) => {
 
 export const updateAgendamentoStatus = async (id, status) => {
   return await updateDoc(doc(db, 'agendamentos', id), { status });
+};
+
+export const updateAgendamento = async (id, data) => {
+  return await updateDoc(doc(db, 'agendamentos', id), data);
 };
 
 export const deleteAgendamento = async (id) => {

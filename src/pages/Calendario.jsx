@@ -14,7 +14,8 @@ import {
   Loader2,
   CalendarDays,
   Columns3,
-  CalendarRange
+  CalendarRange,
+  Edit2
 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { 
@@ -35,7 +36,7 @@ import {
   isToday 
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { subscribeAgendamentos, addAgendamento, updateAgendamentoStatus, deleteAgendamento, subscribeClientes, addCliente } from '../services/db';
+import { subscribeAgendamentos, addAgendamento, updateAgendamento, updateAgendamentoStatus, deleteAgendamento, subscribeClientes, addCliente } from '../services/db';
 import { generateGoogleCalendarLink } from '../utils/googleCalendar';
 
 export default function Calendario() {
@@ -49,6 +50,8 @@ export default function Calendario() {
   const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savingClient, setSavingClient] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [openGoogleOnSave, setOpenGoogleOnSave] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -168,21 +171,61 @@ export default function Calendario() {
     setCurrentDate(new Date());
   };
 
+  const handleEditAgendamento = (app) => {
+    setEditingId(app.id);
+    setFormData({
+      cliente: app.cliente || '',
+      telefone: app.telefone || '',
+      servico: app.servico || 'Instalação de Ar-Condicionado',
+      endereco: app.endereco || '',
+      data: app.data || new Date().toISOString().split('T')[0],
+      hora: app.hora || '09:00',
+      status: app.status || 'confirmado'
+    });
+    setModalOpen(true);
+  };
+
+  const openNewAgendamento = () => {
+    setEditingId(null);
+    setFormData({
+      cliente: '',
+      telefone: '',
+      servico: 'Instalação de Ar-Condicionado',
+      endereco: '',
+      data: format(currentDate, 'yyyy-MM-dd'),
+      hora: '09:00',
+      status: 'confirmado'
+    });
+    setModalOpen(true);
+  };
+
   const handleAddAgendamento = async (e) => {
     e.preventDefault();
     if (!formData.cliente.trim()) return;
 
     setSaving(true);
     try {
-      await addAgendamento(formData);
+      if (editingId) {
+        await updateAgendamento(editingId, formData);
+      } else {
+        await addAgendamento(formData);
+      }
+
+      if (openGoogleOnSave) {
+        const link = generateGoogleCalendarLink(formData);
+        window.open(link, '_blank');
+      }
+
       setFormData({
         cliente: '',
+        telefone: '',
         servico: 'Instalação de Ar-Condicionado',
         endereco: '',
         data: format(currentDate, 'yyyy-MM-dd'),
         hora: '09:00',
         status: 'confirmado'
       });
+      setEditingId(null);
       setModalOpen(false);
     } catch (err) {
       console.error("Erro ao salvar agendamento:", err);
@@ -212,8 +255,12 @@ export default function Calendario() {
   };
 
   const openNewForDateAndHour = (dateStr, hourStr = '09:00') => {
+    setEditingId(null);
     setFormData(prev => ({
       ...prev,
+      cliente: '',
+      telefone: '',
+      endereco: '',
       data: dateStr,
       hora: hourStr
     }));
@@ -397,14 +444,21 @@ export default function Calendario() {
                                       href={generateGoogleCalendarLink(app)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="px-3 py-1 rounded-lg text-xs font-bold border bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200 transition-colors flex items-center gap-1"
-                                      title="Adicionar ao Google Agenda"
+                                      className="px-3 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors flex items-center gap-1.5 shadow-xs"
+                                      title="Abrir no Google Agenda"
                                     >
-                                      <CalendarIcon className="w-3.5 h-3.5" /> Google Agenda
+                                      <CalendarIcon className="w-3.5 h-3.5 text-blue-600" /> Google Agenda
                                     </a>
                                     <button 
+                                      onClick={() => handleEditAgendamento(app)}
+                                      className="px-3 py-1.5 rounded-xl text-xs font-bold border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-1.5 shadow-xs"
+                                      title="Editar Compromisso"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5 text-indigo-600" /> Editar
+                                    </button>
+                                    <button 
                                       onClick={() => handleToggleStatus(app.id, app.status)}
-                                      className={`px-3 py-1 rounded-lg text-xs font-bold border transition-colors ${
+                                      className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${
                                         app.status === 'confirmado' 
                                           ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
                                           : 'bg-amber-100 text-amber-800 border-amber-200'
@@ -414,7 +468,7 @@ export default function Calendario() {
                                     </button>
                                     <button 
                                       onClick={() => handleDelete(app.id)}
-                                      className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                      className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
                                       title="Remover"
                                     >
                                       <Trash2 className="w-4 h-4" />
@@ -487,19 +541,39 @@ export default function Calendario() {
                           dayAppointments.map(app => (
                             <div 
                               key={app.id} 
-                              className="p-2.5 rounded-xl border border-slate-200 hover:border-blue-300 bg-slate-50 hover:bg-white transition-all shadow-sm group relative"
+                              onClick={() => handleEditAgendamento(app)}
+                              className="p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white transition-all shadow-xs hover:shadow-md group relative cursor-pointer"
                             >
                               <div className="flex items-center justify-between text-xs mb-1">
-                                <span className="font-extrabold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">
+                                <span className="font-extrabold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded text-[11px]">
                                   {app.hora}
                                 </span>
-                                <button 
-                                  onClick={() => handleDelete(app.id)}
-                                  className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  title="Excluir"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                  <a 
+                                    href={generateGoogleCalendarLink(app)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Abrir no Google Agenda"
+                                  >
+                                    <CalendarIcon className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); handleEditAgendamento(app); }}
+                                    className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                    title="Editar compromisso"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(app.id); }}
+                                    className="p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Excluir"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                               <p className="font-bold text-slate-800 text-xs truncate" title={app.cliente}>
                                 {app.cliente}
@@ -508,8 +582,9 @@ export default function Calendario() {
                                 {app.servico}
                               </p>
                               {app.endereco && (
-                                <p className="text-[10px] text-slate-400 truncate mt-0.5" title={app.endereco}>
-                                  {app.endereco}
+                                <p className="text-[10px] text-slate-400 truncate mt-0.5 flex items-center gap-1" title={app.endereco}>
+                                  <MapPin className="w-3 h-3 text-slate-300 shrink-0" />
+                                  <span className="truncate">{app.endereco}</span>
                                 </p>
                               )}
                             </div>
@@ -584,7 +659,15 @@ export default function Calendario() {
                             {/* Mini Cards no Dia do Mês */}
                             <div className="space-y-1 my-1 overflow-hidden">
                               {dayApps.slice(0, 2).map(app => (
-                                <div key={app.id} className="text-[10px] truncate bg-blue-100/70 text-blue-900 font-semibold px-1 py-0.5 rounded-md">
+                                <div 
+                                  key={app.id} 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditAgendamento(app);
+                                  }}
+                                  className="text-[10px] truncate bg-blue-100/70 hover:bg-blue-200 text-blue-900 font-semibold px-1 py-0.5 rounded-md transition-colors"
+                                  title={`Editar compromisso: ${app.cliente}`}
+                                >
                                   <span className="font-extrabold mr-1">{app.hora}</span>
                                   {app.cliente}
                                 </div>
@@ -671,10 +754,16 @@ export default function Calendario() {
                                 href={generateGoogleCalendarLink(app)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
                               >
-                                <CalendarIcon className="w-3 h-3" /> Agenda
+                                <CalendarIcon className="w-3 h-3" /> Google Agenda
                               </a>
+                              <button 
+                                onClick={() => handleEditAgendamento(app)}
+                                className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                              >
+                                <Edit2 className="w-3 h-3" /> Editar
+                              </button>
                               <button 
                                 onClick={() => handleToggleStatus(app.id, app.status)}
                                 className="text-[10px] font-bold text-slate-600 hover:text-blue-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
@@ -703,11 +792,22 @@ export default function Calendario() {
 
       {/* Modal Novo Agendamento */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-800">Novo Agendamento</h3>
-              <button onClick={() => setModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
+              <h3 className="text-xl font-bold text-slate-800">
+                {editingId ? 'Editar Agendamento' : 'Novo Agendamento'}
+              </h3>
+              <button 
+                onClick={() => { setModalOpen(false); setEditingId(null); }} 
+                className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -778,21 +878,62 @@ export default function Calendario() {
                 />
               </div>
 
-              <div className="pt-4 flex justify-end gap-3">
-                <button 
-                  type="button" 
-                  onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 text-sm"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={saving}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md disabled:bg-blue-400 text-sm"
-                >
-                  {saving ? 'Agendando...' : 'Salvar no Firebase'}
-                </button>
+              {/* Opção Integrar com Google Agenda */}
+              <div className="bg-blue-50/70 border border-blue-200/80 p-3.5 rounded-2xl flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-white border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs shrink-0">
+                    <CalendarIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <label htmlFor="google-sync" className="text-xs font-bold text-slate-800 cursor-pointer block">
+                      Sincronizar com Google Agenda
+                    </label>
+                    <span className="text-[11px] text-slate-500 block">
+                      Abre o evento já preenchido no seu Google Calendar ao salvar
+                    </span>
+                  </div>
+                </div>
+                <input 
+                  type="checkbox" 
+                  id="google-sync"
+                  checked={openGoogleOnSave}
+                  onChange={(e) => setOpenGoogleOnSave(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                />
+              </div>
+
+              <div className="pt-4 flex items-center justify-between gap-3 flex-wrap border-t border-slate-100">
+                <div>
+                  {formData.cliente && (
+                    <a
+                      href={generateGoogleCalendarLink(formData)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      title="Abrir no Google Agenda agora"
+                    >
+                      <CalendarIcon className="w-3.5 h-3.5" /> Google Agenda
+                    </a>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => { setModalOpen(false); setEditingId(null); }}
+                    className="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 text-sm"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={saving}
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md disabled:bg-blue-400 text-sm flex items-center gap-1.5"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    <span>{saving ? 'Gravando...' : editingId ? 'Salvar Alterações' : 'Salvar no Firebase'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -800,8 +941,14 @@ export default function Calendario() {
       )}
       {/* Modal Quick Add Cliente */}
       {newClientModalOpen && (
-        <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setNewClientModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">Cadastrar Novo Cliente</h3>
               <button onClick={() => setNewClientModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">

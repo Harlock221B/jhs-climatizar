@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   FileText, 
+  Edit2,
   Plus, 
   Search, 
   Trash2, 
@@ -28,7 +29,8 @@ import {
   updateOrcamentoValor, 
   deleteOrcamento,
   subscribeClientes,
-  addCliente
+  addCliente,
+  updateOrcamento
 } from '../services/db';
 import OrcamentoPDFModal from '../components/OrcamentoPDFModal';
 
@@ -73,6 +75,7 @@ export default function Orcamentos() {
   const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savingClient, setSavingClient] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [selectedForPDF, setSelectedForPDF] = useState(null);
 
   // Form State
@@ -169,24 +172,44 @@ export default function Orcamentos() {
     }
   };
 
+  const handleEditOrcamento = (orc) => {
+    setFormData({ ...DEFAULT_FORM_DATA, ...orc });
+    setEditingId(orc.id);
+    setModalOpen(true);
+  };
+
+  const openNewOrcamentoModal = () => {
+    setFormData(DEFAULT_FORM_DATA);
+    setEditingId(null);
+    setModalOpen(true);
+  };
+
   const handleAddOrcamento = async (e) => {
     e.preventDefault();
     if (!formData.cliente.trim() || !formData.valor) return;
 
     setSaving(true);
     try {
-      const nextNum = (1000 + orcamentos.length + 1).toString();
-      await addOrcamento({
-        ...formData,
-        numero: nextNum,
-        valor: parseFloat(formData.valor.toString().replace(',', '.')) || 0,
-        createdAtClient: new Date().toISOString()
-      });
+      if (editingId) {
+        await updateOrcamento(editingId, {
+          ...formData,
+          valor: parseFloat(formData.valor.toString().replace(',', '.')) || 0,
+        });
+      } else {
+        const nextNum = (1000 + orcamentos.length + 1).toString();
+        await addOrcamento({
+          ...formData,
+          numero: nextNum,
+          valor: parseFloat(formData.valor.toString().replace(',', '.')) || 0,
+          createdAtClient: new Date().toISOString()
+        });
+      }
 
       setFormData(DEFAULT_FORM_DATA);
+      setEditingId(null);
       setModalOpen(false);
     } catch (err) {
-      console.error("Erro ao adicionar orçamento:", err);
+      console.error("Erro ao salvar orçamento:", err);
       alert("Erro ao salvar no Firestore. Verifique as permissões.");
     } finally {
       setSaving(false);
@@ -278,7 +301,8 @@ export default function Orcamentos() {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 h-full flex flex-col">
+    <>
+      <div className={`space-y-6 animate-in fade-in duration-500 h-full flex flex-col ${selectedForPDF ? 'print:hidden' : ''}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Orçamentos & Propostas</h1>
@@ -286,7 +310,7 @@ export default function Orcamentos() {
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => setModalOpen(true)}
+            onClick={openNewOrcamentoModal}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-1"
           >
             <Plus className="w-5 h-5" /> Criar Orçamento Completo
@@ -446,6 +470,13 @@ export default function Orcamentos() {
                     <td className="p-4 pr-6 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <button 
+                          onClick={() => handleEditOrcamento(orcamento)}
+                          title="Editar orçamento"
+                          className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors border border-indigo-100"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
                           onClick={() => setSelectedForPDF(orcamento)}
                           title="Gerar Proposta em PDF / Termo de Garantia"
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-blue-100"
@@ -554,6 +585,14 @@ export default function Orcamentos() {
 
                   <div className="flex items-center gap-2">
                     <button 
+                      onClick={() => handleEditOrcamento(orcamento)}
+                      className="p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95 rounded-xl border border-indigo-200/60 transition-all"
+                      title="Editar Proposta"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+
+                    <button 
                       onClick={() => handleSendWhatsApp(orcamento)}
                       className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold py-2.5 px-3.5 rounded-xl shadow-sm transition-all"
                       title="Enviar Proposta no WhatsApp"
@@ -585,17 +624,26 @@ export default function Orcamentos() {
         </>
       )}
       </div>
+      </div>
 
       {/* Modal Criar Orçamento Completo */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto border border-slate-100">
+        <div 
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          onClick={() => setModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto border border-slate-100"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Header Modal */}
             <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-6">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">JHS Climatizar</span>
-                <h3 className="text-xl font-bold text-slate-900">Novo Orçamento Técnico</h3>
+                <h3 className="text-xl font-bold text-slate-900">
+                  {editingId ? 'Editar Orçamento Técnico' : 'Novo Orçamento Técnico'}
+                </h3>
               </div>
               <button 
                 onClick={() => setModalOpen(false)} 
@@ -990,8 +1038,14 @@ export default function Orcamentos() {
 
       {/* Modal Adicionar Novo Cliente Rápido */}
       {newClientModalOpen && (
-        <div className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setNewClientModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">Novo Cliente Rápido</h3>
               <button onClick={() => setNewClientModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
@@ -1021,6 +1075,6 @@ export default function Orcamentos() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
