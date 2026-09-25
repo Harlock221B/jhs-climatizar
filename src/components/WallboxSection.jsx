@@ -264,26 +264,7 @@ export function WallboxSection() {
               </div>
             </div>
 
-            {/* Botões de Ação (WhatsApp + Orçamento no Site) */}
-            <div className="pt-4 flex flex-col sm:flex-row gap-3.5">
-              <a 
-                href="https://wa.me/5519992327227?text=Ol%C3%A1%20Rodrigo!%20Gostaria%20de%20um%20or%C3%A7amento%20para%20instala%C3%A7%C3%A3o%20de%20carregador%20Wallbox%20para%20carro%20el%C3%A9trico." 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-black py-4 px-8 rounded-full transition-all shadow-lg shadow-emerald-600/30 hover:scale-105"
-              >
-                <Phone className="w-5 h-5 fill-white" />
-                (19) 99232-7227 • Rodrigo
-              </a>
 
-              <a 
-                href="#orcamento"
-                className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-blue-600 text-white text-sm font-bold py-4 px-6 rounded-full transition-all shadow-md hover:scale-105"
-              >
-                Pedir Orçamento Online
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
 
           </div>
 

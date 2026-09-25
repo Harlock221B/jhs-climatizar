@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Snowflake, 
   Wrench, 
@@ -23,7 +23,12 @@ import {
   Calculator,
   MapPin,
   Camera,
-  Zap
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  X,
+  Cpu
 } from 'lucide-react';
 import { solicitarOrcamentoViaSite } from '../services/db';
 import { WallboxSection } from '../components/WallboxSection';
@@ -237,14 +242,6 @@ const Services = () => {
       link: WHATSAPP_LINK
     },
     { 
-      titulo: 'Instalação de Wallbox', 
-      tag: 'Carregador EV • NBR 5410',
-      fotoProcesso: fotoWallbox1,
-      icone: <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />, 
-      desc: 'Infraestrutura elétrica para veículos elétricos e híbridos (BYD, GWM, Volvo). Quadro elétrico dedicado com disjuntor DR e DPS para máxima segurança da sua casa e bateria.',
-      link: 'https://wa.me/5519992327227?text=Olá Rodrigo! Gostaria de um orçamento para instalação de carregador Wallbox para carro elétrico.'
-    },
-    { 
       titulo: 'Manutenção Corretiva', 
       tag: 'Diagnóstico & Reparo',
       fotoProcesso: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
@@ -284,11 +281,11 @@ const Services = () => {
             </h3>
           </div>
           <p className="text-slate-500 text-base sm:text-lg max-w-md leading-relaxed">
-            Do projeto à manutenção periódica, a JHS Climatizar oferece um cuidado clínico e profissional para o seu ar-condicionado e estações de carregamento veicular (Wallbox).
+            Do projeto à manutenção periódica, a JHS Climatizar oferece um cuidado clínico e profissional para o seu ar-condicionado.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {servicos.map((servico, index) => (
             <div 
               key={index} 
@@ -324,6 +321,31 @@ const Services = () => {
             </div>
           ))}
         </div>
+
+        {/* Banner Orgânico de Conexão com o Wallbox */}
+        <div className="mt-12 bg-gradient-to-r from-blue-50/90 via-slate-50 to-blue-50/90 border border-blue-200/80 rounded-[2rem] p-5 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5 shadow-xs">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+              <Zap className="w-6 h-6 fill-white" />
+            </div>
+            <div>
+              <h5 className="font-extrabold text-base sm:text-lg text-slate-900">
+                Possui carro elétrico ou híbrido? Conheça a Instalação de Wallbox
+              </h5>
+              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+                Projetos elétricos com quadro exclusivo, disjuntores dedicados DR e DPS conforme norma NBR 5410.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#wallbox"
+            className="inline-flex items-center gap-2 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs sm:text-sm py-3 px-6 rounded-full shadow-md transition-all hover:scale-105 whitespace-nowrap"
+          >
+            Ver Especialidade Wallbox
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
+
       </div>
     </section>
   );
@@ -448,70 +470,122 @@ const ProcessSection = () => {
 };
 
 const RealWorkGallery = () => {
-  const fotosReais = [
+  const [filtro, setFiltro] = useState('todos');
+  const [fotoModal, setFotoModal] = useState(null);
+  const sliderRef = useRef(null);
+
+  const trabalhosReais = [
+    // 1 a 4: SERVIÇOS DE AR-CONDICIONADO (PRIMEIRO)
     {
+      id: 1,
+      categoria: 'ar',
       foto: fotoRodrigo5,
       titulo: 'Higienização Química com Coletor',
       subtitulo: 'Evaporadora Residencial',
       badge: 'Lavagem sob Pressão',
-      desc: 'Desmontagem técnica, isolamento com bolsa impermeável vedada e lavagem sob pressão com bactericida. Zero respingos no piso e ar puro para sua família.',
+      tagCategoria: '❄️ Ar-Condicionado',
+      desc: 'Desmontagem técnica, isolamento com bolsa impermeável vedada e lavagem sob pressão com bactericida hospitalar. Zero respingos no piso e ar 100% puro para sua família.',
       icone: <Droplets className="w-4 h-4 text-cyan-400" />
     },
     {
+      id: 2,
+      categoria: 'ar',
       foto: fotoRodrigo4,
       titulo: 'Vácuo Técnico & Manifold',
       subtitulo: 'Condensadora Externa',
       badge: 'Pressão & Estanqueidade',
-      desc: 'Aplicação de bomba de vácuo profundo e manômetro manifold para teste rigoroso de estanqueidade. Gás preservado e máxima durabilidade do compressor.',
+      tagCategoria: '❄️ Ar-Condicionado',
+      desc: 'Aplicação de bomba de vácuo duplo estágio e manômetro manifold para teste rigoroso de estanqueidade. Gás preservado e máxima durabilidade do compressor.',
       icone: <Settings className="w-4 h-4 text-blue-400" />
     },
     {
+      id: 3,
+      categoria: 'ar',
       foto: fotoRodrigo6,
       titulo: 'Instalação em Altura (NR-35)',
       subtitulo: 'Coberturas & Telhados',
       badge: 'Segurança & EPI Completo',
-      desc: 'Trabalho em telhados e fachadas com capacete, cinto paraquedista, trava-quedas e ancoragem certificada. Cuidado com o telhado e segurança patrimonial.',
+      tagCategoria: '❄️ Ar-Condicionado',
+      desc: 'Trabalho em telhados e fachadas com capacete, cinto paraquedista, trava-quedas e ancoragem certificada. Cuidado absoluto com o telhado e segurança patrimonial.',
       icone: <ShieldCheck className="w-4 h-4 text-amber-400" />
     },
     {
+      id: 4,
+      categoria: 'ar',
       foto: fotoRodrigo3,
       titulo: 'Aferição Digital a 16°C',
       subtitulo: 'Samsung WindFree',
       badge: 'Teste de Rendimento',
-      desc: 'Medição com sensor de temperatura e anemômetro direto na saída de ar atingindo 16°C. Comprovação científica de rendimento térmico no ato da entrega.',
+      tagCategoria: '❄️ Ar-Condicionado',
+      desc: 'Medição em tempo real com sensor térmico e anemômetro direto na saída de ar atingindo 16°C. Comprovação científica do rendimento do aparelho na entrega.',
       icone: <ThermometerSnowflake className="w-4 h-4 text-emerald-400" />
     },
+    // 5 a 7: SERVIÇOS DE WALLBOX (DEPOIS)
     {
+      id: 5,
+      categoria: 'wallbox',
       foto: fotoWallbox1,
       titulo: 'Estação Wallbox (GWM & Intelbras)',
       subtitulo: 'Carregamento Veicular',
       badge: 'Eletromobilidade & NR-10',
-      desc: 'Quadro elétrico dedicado com disjuntores, DPS e eletroduto galvanizado para carregamento seguro e eficiente de veículos elétricos e híbridos.',
+      tagCategoria: '⚡ Wallbox Carro Elétrico',
+      desc: 'Instalação de duas estações com eletroduto galvanizado industrial, suportes de cabos e acabamento resistente para veículos 100% elétricos e híbridos plug-in.',
       icone: <Zap className="w-4 h-4 text-cyan-400" />
     },
     {
-      foto: fotoWallbox3,
-      titulo: 'Quadro de Proteção DR / DPS',
-      subtitulo: 'Padrão NBR 5410',
-      badge: 'Proteção & Aterramento',
-      desc: 'Montagem interna técnica com disjuntores bipolares, barramento de aterramento (PE) e proteção contra surtos, garantindo a integridade da bateria.',
+      id: 6,
+      categoria: 'wallbox',
+      foto: fotoWallbox2,
+      titulo: 'Quadro de Proteção Elétrica DR / DPS',
+      subtitulo: 'Isolamento da Rede',
+      badge: 'Quadro Dedicado',
+      tagCategoria: '⚡ Wallbox Carro Elétrico',
+      desc: 'Quadro de distribuição exclusivo com disjuntores bipolares independentes, DR contra choque elétrico e DPS classe II para salvaguardar a bateria contra descargas da concessionária.',
       icone: <ShieldCheck className="w-4 h-4 text-emerald-400" />
+    },
+    {
+      id: 7,
+      categoria: 'wallbox',
+      foto: fotoWallbox3,
+      titulo: 'Montagem Técnica da Fiação (NBR 5410)',
+      subtitulo: 'Cabos 100% Cobre',
+      badge: 'Proteção & Aterramento PE',
+      tagCategoria: '⚡ Wallbox Carro Elétrico',
+      desc: 'Cabeamento de alta bitola 100% cobre, barramentos de fase e neutro protegidos e aterramento individual para recargas contínuas de 7,4 kW a 22 kW sem qualquer aquecimento.',
+      icone: <Cpu className="w-4 h-4 text-blue-400" />
     }
   ];
 
+  const itensExibidos = filtro === 'todos' 
+    ? trabalhosReais 
+    : trabalhosReais.filter(item => item.categoria === filtro);
+
+  const scrollSlider = (direction) => {
+    if (sliderRef.current) {
+      const scrollAmount = sliderRef.current.clientWidth * 0.75;
+      sliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <section id="galeria" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-100/60">
-      <div className="max-w-7xl mx-auto rounded-[3rem] bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white p-8 sm:p-12 lg:p-16 relative overflow-hidden shadow-2xl border border-slate-800">
-        {/* Ambient glows */}
+    <section id="galeria" className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-100/60 relative">
+      <div className="max-w-7xl mx-auto rounded-[3rem] bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white p-6 sm:p-10 lg:p-14 relative overflow-hidden shadow-2xl border border-slate-800">
+        
+        {/* Glows de Fundo */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-500/15 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
-            <div>
-              <span className="inline-flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-widest text-xs mb-3 bg-cyan-950/80 border border-cyan-800/80 px-3.5 py-1.5 rounded-full">
+        <div className="relative z-10 space-y-10">
+          
+          {/* Cabeçalho com Título e Controles do Slider */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-slate-800/80 pb-8">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-widest text-xs mb-3 bg-cyan-950/80 border border-cyan-800/80 px-3.5 py-1.5 rounded-full shadow-sm">
                 <Camera className="w-3.5 h-3.5" />
-                Galeria de Trabalhos Reais
+                Galeria de Trabalhos Reais • Slider Interativo
               </span>
               <h3 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
                 O trabalho real de quem entende <br />
@@ -519,33 +593,116 @@ const RealWorkGallery = () => {
                   de climatização e elétrica na prática.
                 </span>
               </h3>
+              <p className="text-slate-400 text-sm md:text-base mt-3 leading-relaxed">
+                Navegue pelas fotos reais dos serviços executados pelo Rodrigo e equipe da JHS Climatizar: primeiro as manutenções e instalações de ar-condicionado, seguidas pela infraestrutura de recarga veicular Wallbox.
+              </p>
             </div>
-            <p className="text-slate-400 text-sm md:text-base max-w-md leading-relaxed">
-              Nada de fotos genéricas de banco de imagens. Aqui você confere o padrão técnico executado pelo Rodrigo e equipe da JHS Climatizar em residências e empresas de Monte Mor e região.
-            </p>
+
+            {/* Controles de Navegação (Anterior / Próximo) */}
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => scrollSlider('left')}
+                className="w-12 h-12 rounded-2xl bg-slate-800/90 hover:bg-blue-600 text-white flex items-center justify-center border border-slate-700 hover:border-blue-500 transition-all shadow-md hover:scale-105 active:scale-95 group"
+                aria-label="Foto anterior"
+                title="Foto anterior"
+              >
+                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => scrollSlider('right')}
+                className="w-12 h-12 rounded-2xl bg-slate-800/90 hover:bg-blue-600 text-white flex items-center justify-center border border-slate-700 hover:border-blue-500 transition-all shadow-md hover:scale-105 active:scale-95 group"
+                aria-label="Próxima foto"
+                title="Próxima foto"
+              >
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {fotosReais.map((item, idx) => (
+          {/* Filtros Orgânicos em Abas */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => {
+                setFiltro('todos');
+                if (sliderRef.current) sliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+              }}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                filtro === 'todos'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/40'
+                  : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              Todos os Trabalhos ({trabalhosReais.length})
+            </button>
+            <button
+              onClick={() => {
+                setFiltro('ar');
+                if (sliderRef.current) sliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+              }}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                filtro === 'ar'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/40'
+                  : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <span>❄️</span> Ar-Condicionado (4)
+            </button>
+            <button
+              onClick={() => {
+                setFiltro('wallbox');
+                if (sliderRef.current) sliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+              }}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                filtro === 'wallbox'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/40'
+                  : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <span>⚡</span> Wallbox & Elétrica (3)
+            </button>
+          </div>
+
+          {/* Carrossel / Slider com Snap Suave */}
+          <div 
+            ref={sliderRef}
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 pt-2 no-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {itensExibidos.map((item) => (
               <div 
-                key={idx}
-                className="group bg-slate-900/90 backdrop-blur-md rounded-[2rem] overflow-hidden border border-slate-800/80 hover:border-blue-500/60 shadow-xl transition-all duration-500 flex flex-col hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
+                key={item.id}
+                className="shrink-0 w-[85%] sm:w-[48%] lg:w-[31.5%] snap-start group bg-slate-900/90 backdrop-blur-md rounded-[2.2rem] overflow-hidden border border-slate-800 hover:border-blue-500/70 shadow-xl transition-all duration-500 flex flex-col hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)]"
               >
-                <div className="relative aspect-[3/4] overflow-hidden bg-slate-950">
+                {/* Imagem do Card */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-950">
                   <img 
                     src={item.foto} 
                     alt={item.titulo} 
-                    className="w-full h-full object-cover object-top group-hover:scale-108 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover object-top group-hover:scale-108 transition-transform duration-700 ease-out cursor-pointer"
+                    onClick={() => setFotoModal(item)}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-80 group-hover:opacity-60 transition-opacity pointer-events-none" />
                   
-                  <div className="absolute top-3.5 left-3.5 bg-slate-900/90 backdrop-blur-md px-3 py-1 rounded-full border border-slate-700/80 flex items-center gap-1.5 text-[11px] font-bold text-white shadow-lg">
-                    {item.icone}
-                    <span>{item.badge}</span>
+                  {/* Badges superiores */}
+                  <div className="absolute top-3.5 left-3.5 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+                    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1 rounded-full border border-slate-700/80 flex items-center gap-1.5 text-[11px] font-bold text-white shadow-lg">
+                      {item.icone}
+                      <span>{item.badge}</span>
+                    </div>
                   </div>
 
-                  <div className="absolute bottom-3.5 left-3.5 right-3.5">
-                    <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-0.5">
+                  {/* Botão de Ampliação */}
+                  <button
+                    onClick={() => setFotoModal(item)}
+                    className="absolute top-3.5 right-3.5 bg-slate-900/90 hover:bg-white text-slate-300 hover:text-slate-900 p-2 rounded-xl border border-slate-700 shadow-md transition-all hover:scale-110 z-10"
+                    title="Ampliar foto"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Informação sobreposta na foto */}
+                  <div className="absolute bottom-3.5 left-3.5 right-3.5 pointer-events-none">
+                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-wider block mb-0.5">
                       {item.subtitulo}
                     </span>
                     <h4 className="text-base font-black text-white leading-snug">
@@ -554,26 +711,94 @@ const RealWorkGallery = () => {
                   </div>
                 </div>
 
+                {/* Corpo do Card */}
                 <div className="p-5 flex flex-col flex-grow justify-between bg-slate-900/60">
                   <p className="text-xs text-slate-400 leading-relaxed mb-4">
                     {item.desc}
                   </p>
                   
-                  <a 
-                    href={WHATSAPP_LINK}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-blue-400 group-hover:text-cyan-300 transition-colors"
-                  >
-                    <span>Agendar atendimento</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform" />
-                  </a>
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500">
+                      {item.tagCategoria}
+                    </span>
+                    <a 
+                      href={item.categoria === 'wallbox' 
+                        ? "https://wa.me/5519992327227?text=Olá Rodrigo! Vi a foto da instalação do Wallbox na galeria e gostaria de um orçamento."
+                        : "https://wa.me/5519992327227?text=Olá Rodrigo! Vi o serviço de ar-condicionado na galeria e gostaria de agendar um atendimento."
+                      }
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-black text-blue-400 group-hover:text-cyan-300 transition-colors"
+                    >
+                      <span>Orçar</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Dica de arraste / navegação no rodapé do slider */}
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800/80">
+            <span className="flex items-center gap-1.5">
+              <span>👉</span> Deslize para os lados para visualizar mais fotos reais
+            </span>
+            <span className="font-bold text-slate-400">
+              {itensExibidos.length} {itensExibidos.length === 1 ? 'registro' : 'registros'} de serviços reais
+            </span>
+          </div>
+
         </div>
       </div>
+
+      {/* Lightbox / Modal de Foto Ampliada */}
+      {fotoModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setFotoModal(null)}
+        >
+          <div 
+            className="relative max-w-4xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative max-h-[75vh] flex items-center justify-center bg-slate-950">
+              <img 
+                src={fotoModal.foto} 
+                alt={fotoModal.titulo}
+                className="w-full h-auto max-h-[72vh] object-contain"
+              />
+              <button
+                onClick={() => setFotoModal(null)}
+                className="absolute top-4 right-4 bg-slate-900/90 hover:bg-slate-800 text-white p-2.5 rounded-full border border-slate-700 shadow-xl transition-transform hover:scale-110"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 bg-slate-900 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-800">
+              <div>
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider block">
+                  {fotoModal.tagCategoria} • {fotoModal.badge}
+                </span>
+                <h4 className="text-lg font-black text-white">{fotoModal.titulo}</h4>
+                <p className="text-xs text-slate-300 mt-1 max-w-xl">{fotoModal.desc}</p>
+              </div>
+              <a 
+                href={fotoModal.categoria === 'wallbox'
+                  ? "https://wa.me/5519992327227?text=Olá Rodrigo! Vi a foto da instalação do Wallbox e gostaria de um orçamento."
+                  : "https://wa.me/5519992327227?text=Olá Rodrigo! Vi a foto do serviço de ar-condicionado e gostaria de agendar."
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-5 rounded-full flex items-center gap-2 whitespace-nowrap shadow-md hover:scale-105 transition-transform"
+              >
+                <Phone className="w-3.5 h-3.5 fill-white" />
+                Agendar este serviço
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
@@ -1245,9 +1470,9 @@ export default function Home() {
       <main>
         <Hero />
         <Services />
-        <WallboxSection />
         <ProcessSection />
         <RealWorkGallery />
+        <WallboxSection />
         <QuoteRequestSection />
         <About />
         <LocationSection />
