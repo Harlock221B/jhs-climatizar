@@ -22,9 +22,11 @@ import {
   Loader2,
   Calculator,
   MapPin,
-  Camera
+  Camera,
+  Zap
 } from 'lucide-react';
 import { solicitarOrcamentoViaSite } from '../services/db';
+import { WallboxSection } from '../components/WallboxSection';
 import logoIcon from '../assets/icon/icon.png';
 import logoIconeSite from '../assets/icon/icone_site.jpg';
 import fotoRodrigo1 from '../assets/img/rodrigo-1.png';
@@ -33,6 +35,7 @@ import fotoRodrigo3 from '../assets/img/rodrigo-3.jpeg';
 import fotoRodrigo4 from '../assets/img/rodrigo-4.jpeg';
 import fotoRodrigo5 from '../assets/img/rodrigo-5.png';
 import fotoRodrigo6 from '../assets/img/rodrigo-6.png';
+import fotoWallboxReal from '../assets/img/wallbox-1.png';
 
 const AVATAR_PROFILES = [
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
@@ -70,8 +73,11 @@ const Navbar = () => {
           </div>
         </a>
         
-        <div className="hidden lg:flex gap-6 items-center bg-white/80 backdrop-blur-md px-7 py-2.5 rounded-full border border-slate-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="hidden lg:flex gap-5 items-center bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-slate-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           <a href="#servicos" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Serviços</a>
+          <a href="#wallbox" className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5" /> Wallbox
+          </a>
           <a href="#processo" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-cyan-500" /> Como Funciona
           </a>
@@ -459,6 +465,14 @@ const RealWorkGallery = () => {
       badge: 'Teste de Rendimento',
       desc: 'Medição com sensor de temperatura e anemômetro direto na saída de ar atingindo 16°C. Comprovação científica de rendimento térmico no ato da entrega.',
       icone: <ThermometerSnowflake className="w-4 h-4 text-emerald-400" />
+    },
+    {
+      foto: fotoWallboxReal,
+      titulo: 'Instalação de Painel Wallbox',
+      subtitulo: 'GWM & Intelbras',
+      badge: 'Eletromobilidade & NR-10',
+      desc: 'Quadro elétrico dedicado com disjuntores, DPS e eletroduto galvanizado para carregamento seguro e eficiente de veículos elétricos e híbridos.',
+      icone: <Zap className="w-4 h-4 text-cyan-400" />
     }
   ];
 
@@ -488,7 +502,7 @@ const RealWorkGallery = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {fotosReais.map((item, idx) => (
               <div 
                 key={idx}
@@ -684,10 +698,18 @@ const QuoteRequestSection = () => {
                   </label>
                   <select 
                     value={formData.servico}
-                    onChange={(e) => setFormData({...formData, servico: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+                    onChange={(e) => {
+                      const novoServico = e.target.value;
+                      setFormData(prev => ({
+                        ...prev, 
+                        servico: novoServico,
+                        aparelhos: novoServico.includes('Wallbox') ? '1 carregador Wallbox' : (prev.aparelhos.includes('Wallbox') ? '1 aparelho' : prev.aparelhos)
+                      }));
+                    }}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm font-medium"
                   >
-                    <option value="Instalação Nova">Instalação Nova</option>
+                    <option value="Instalação Nova">Instalação Nova de Ar-Condicionado</option>
+                    <option value="Instalação de Wallbox (Carro Elétrico)">⚡ Instalação de Painel para Carro Elétrico (Wallbox)</option>
                     <option value="Manutenção / Reparo">Manutenção / Reparo</option>
                     <option value="Limpeza Profunda">Limpeza Profunda</option>
                     <option value="Higienização Bactericida">Higienização Bactericida</option>
@@ -697,17 +719,28 @@ const QuoteRequestSection = () => {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Qtd de Aparelhos
+                    {formData.servico.includes('Wallbox') ? 'Qtd de Carregadores' : 'Qtd de Aparelhos'}
                   </label>
                   <select 
                     value={formData.aparelhos}
                     onChange={(e) => setFormData({...formData, aparelhos: e.target.value})}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
                   >
-                    <option value="1 aparelho">1 aparelho</option>
-                    <option value="2 aparelhos">2 aparelhos</option>
-                    <option value="3 aparelhos">3 aparelhos</option>
-                    <option value="4 ou mais">4 ou mais aparelhos</option>
+                    {formData.servico.includes('Wallbox') ? (
+                      <>
+                        <option value="1 carregador Wallbox">1 carregador Wallbox</option>
+                        <option value="2 carregadores Wallbox">2 carregadores Wallbox</option>
+                        <option value="3 ou mais (Condomínio / Frota)">3 ou mais (Condomínio / Frota)</option>
+                        <option value="Ponto dedicado 20A / 32A">Ponto dedicado 20A / 32A</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="1 aparelho">1 aparelho</option>
+                        <option value="2 aparelhos">2 aparelhos</option>
+                        <option value="3 aparelhos">3 aparelhos</option>
+                        <option value="4 ou mais">4 ou mais aparelhos</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>
@@ -1178,6 +1211,7 @@ export default function Home() {
       <main>
         <Hero />
         <Services />
+        <WallboxSection />
         <ProcessSection />
         <RealWorkGallery />
         <QuoteRequestSection />

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { WallboxSection } from './components/WallboxSection';
 
 // Pages
 import Home from './pages/Home';
@@ -21,6 +22,7 @@ export default function App() {
         <Routes>
           {/* Rota Pública (Site Oficial) */}
           <Route path="/" element={<Home />} />
+          <Route path="/wallbox" element={<WallboxSection />} />
           
           {/* Rota de Login */}
           <Route path="/login" element={<Login />} />
