@@ -35,7 +35,10 @@ import fotoRodrigo3 from '../assets/img/rodrigo-3.jpeg';
 import fotoRodrigo4 from '../assets/img/rodrigo-4.jpeg';
 import fotoRodrigo5 from '../assets/img/rodrigo-5.png';
 import fotoRodrigo6 from '../assets/img/rodrigo-6.png';
-import fotoWallboxReal from '../assets/img/wallbox-1.png';
+import fotoWallbox1 from '../assets/img/wallbox-1.png';
+import fotoWallbox2 from '../assets/img/wallbox-2.png';
+import fotoWallbox3 from '../assets/img/wallbox-3.png';
+const fotoWallboxReal = fotoWallbox1;
 
 const AVATAR_PROFILES = [
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
@@ -230,28 +233,40 @@ const Services = () => {
       tag: '100% Cobre & Vácuo',
       fotoProcesso: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80',
       icone: <Wrench className="w-4 h-4 text-blue-600" />, 
-      desc: 'Medição a laser, furação com aspirador acoplado, uso estrito de tubulação 100% cobre e acabamento milimétrico que respeita a estética do seu cômodo.' 
+      desc: 'Medição a laser, furação com aspirador acoplado, uso estrito de tubulação 100% cobre e acabamento milimétrico que respeita a estética do seu cômodo.',
+      link: WHATSAPP_LINK
+    },
+    { 
+      titulo: 'Instalação de Wallbox', 
+      tag: 'Carregador EV • NBR 5410',
+      fotoProcesso: fotoWallbox1,
+      icone: <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />, 
+      desc: 'Infraestrutura elétrica para veículos elétricos e híbridos (BYD, GWM, Volvo). Quadro elétrico dedicado com disjuntor DR e DPS para máxima segurança da sua casa e bateria.',
+      link: 'https://wa.me/5519992327227?text=Olá Rodrigo! Gostaria de um orçamento para instalação de carregador Wallbox para carro elétrico.'
     },
     { 
       titulo: 'Manutenção Corretiva', 
       tag: 'Diagnóstico & Reparo',
       fotoProcesso: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
       icone: <Settings className="w-4 h-4 text-blue-600" />, 
-      desc: 'Ar parou de gelar, está vazando água ou emitindo ruídos? Teste de sensores, capacitores, placas inverter e recarga precisa de fluído refrigerante.' 
+      desc: 'Ar parou de gelar, está vazando água ou emitindo ruídos? Teste de sensores, capacitores, placas inverter e recarga precisa de fluído refrigerante.',
+      link: WHATSAPP_LINK
     },
     { 
       titulo: 'Limpeza Profunda', 
       tag: 'Lavagem sob Pressão',
       fotoProcesso: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
       icone: <Droplets className="w-4 h-4 text-cyan-500" />, 
-      desc: 'Desmontagem técnica da carenagem plástica e aplicação de máquina de pressão com bolsa impermeável vedada. Remoção física de fungos e crostas.' 
+      desc: 'Desmontagem técnica da carenagem plástica e aplicação de máquina de pressão com bolsa impermeável vedada. Remoção física de fungos e crostas.',
+      link: WHATSAPP_LINK
     },
     { 
       titulo: 'Higienização Anvisa', 
       tag: 'Bactericida Hospitalar',
       fotoProcesso: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
       icone: <Sparkles className="w-4 h-4 text-cyan-500" />, 
-      desc: 'Aplicação de sanitizantes e desinfetantes homologados. Elimina ácaros, bactérias e odores desagradáveis, purificando o ar para sua família.' 
+      desc: 'Aplicação de sanitizantes e desinfetantes homologados. Elimina ácaros, bactérias e odores desagradáveis, purificando o ar para sua família.',
+      link: WHATSAPP_LINK
     },
   ];
 
@@ -269,11 +284,11 @@ const Services = () => {
             </h3>
           </div>
           <p className="text-slate-500 text-base sm:text-lg max-w-md leading-relaxed">
-            Do projeto à manutenção periódica, a JHS Climatizar oferece um cuidado clínico e profissional para o seu ar-condicionado.
+            Do projeto à manutenção periódica, a JHS Climatizar oferece um cuidado clínico e profissional para o seu ar-condicionado e estações de carregamento veicular (Wallbox).
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {servicos.map((servico, index) => (
             <div 
               key={index} 
@@ -300,7 +315,7 @@ const Services = () => {
                 {servico.desc}
               </p>
               <a 
-                href={WHATSAPP_LINK}
+                href={servico.link || WHATSAPP_LINK}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold text-sm uppercase tracking-wide mt-auto transition-colors"
               >
@@ -467,12 +482,20 @@ const RealWorkGallery = () => {
       icone: <ThermometerSnowflake className="w-4 h-4 text-emerald-400" />
     },
     {
-      foto: fotoWallboxReal,
-      titulo: 'Instalação de Painel Wallbox',
-      subtitulo: 'GWM & Intelbras',
+      foto: fotoWallbox1,
+      titulo: 'Estação Wallbox (GWM & Intelbras)',
+      subtitulo: 'Carregamento Veicular',
       badge: 'Eletromobilidade & NR-10',
       desc: 'Quadro elétrico dedicado com disjuntores, DPS e eletroduto galvanizado para carregamento seguro e eficiente de veículos elétricos e híbridos.',
       icone: <Zap className="w-4 h-4 text-cyan-400" />
+    },
+    {
+      foto: fotoWallbox3,
+      titulo: 'Quadro de Proteção DR / DPS',
+      subtitulo: 'Padrão NBR 5410',
+      badge: 'Proteção & Aterramento',
+      desc: 'Montagem interna técnica com disjuntores bipolares, barramento de aterramento (PE) e proteção contra surtos, garantindo a integridade da bateria.',
+      icone: <ShieldCheck className="w-4 h-4 text-emerald-400" />
     }
   ];
 
@@ -493,7 +516,7 @@ const RealWorkGallery = () => {
               <h3 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
                 O trabalho real de quem entende <br />
                 <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                  de climatização na prática.
+                  de climatização e elétrica na prática.
                 </span>
               </h3>
             </div>
@@ -502,7 +525,7 @@ const RealWorkGallery = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {fotosReais.map((item, idx) => (
               <div 
                 key={idx}
@@ -753,7 +776,7 @@ const QuoteRequestSection = () => {
                   rows="3"
                   value={formData.detalhes}
                   onChange={(e) => setFormData({...formData, detalhes: e.target.value})}
-                  placeholder="Ex: É apartamento no 3º andar, aparelho de 12.000 BTUs da marca LG, precisa furar parede, etc."
+                  placeholder={formData.servico.includes('Wallbox') ? "Ex: Veículo (BYD Dolphin, GWM Haval, Volvo, etc.), potência desejada (7kW / 22kW), distância até o quadro elétrico..." : "Ex: É apartamento no 3º andar, aparelho de 12.000 BTUs da marca LG, precisa furar parede, etc."}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
                 />
               </div>
@@ -1205,6 +1228,17 @@ const FloatingWhatsApp = () => {
 };
 
 export default function Home() {
+  useEffect(() => {
+    if (window.location.pathname === '/wallbox' || window.location.hash === '#wallbox') {
+      const el = document.getElementById('wallbox');
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 200);
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 selection:bg-blue-600 selection:text-white scroll-smooth">
       <Navbar />

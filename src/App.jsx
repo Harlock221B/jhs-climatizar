@@ -22,7 +22,7 @@ export default function App() {
         <Routes>
           {/* Rota Pública (Site Oficial) */}
           <Route path="/" element={<Home />} />
-          <Route path="/wallbox" element={<WallboxSection />} />
+          <Route path="/wallbox" element={<Home />} />
           
           {/* Rota de Login */}
           <Route path="/login" element={<Login />} />
